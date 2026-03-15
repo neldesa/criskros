@@ -1,0 +1,18 @@
+packages:
+  "framer-motion": "For premium scroll animations and page transitions"
+  "react-hook-form": "For robust registration form state management"
+  "@hookform/resolvers": "For Zod validation integration with react-hook-form"
+  "clsx": "For conditional class names in UI components"
+  "tailwind-merge": "For merging Tailwind classes in UI components safely"
+
+images:
+  - path: "artifacts/criskros/public/images/hero-abstract.png"
+    description: "Abstract geometric background with dynamic athletic energy, using deep navy blue and vibrant magenta/purple gradients, premium dark mode aesthetic"
+    aspect_ratio: "16:9"
+  - path: "artifacts/criskros/public/images/pattern-mesh.png"
+    description: "Subtle 3D wireframe mesh pattern in dark navy blue, suitable for a dark modern background texture, sleek and professional"
+    aspect_ratio: "16:9"
+
+notes:
+  - Frontend only application, no backend required for registration (mock submission)
+  - Single page application with smooth scrolling to sections
