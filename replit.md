@@ -94,3 +94,30 @@ Generated React Query hooks and fetch client from the OpenAPI spec (e.g. `useHea
 ### `scripts` (`@workspace/scripts`)
 
 Utility scripts package. Each script is a `.ts` file in `src/` with a corresponding npm script in `package.json`. Run scripts via `pnpm --filter @workspace/scripts run <script>`. Scripts can import any workspace package (e.g., `@workspace/db`) by adding it as a dependency in `scripts/package.json`.
+
+### `artifacts/criskros` (`@workspace/criskros`)
+
+React + Vite single-page website for **Criskros** — a multi-sport corporate team event brand.
+
+- **Brand**: Navy (#1E2D6B) + magenta (#9B30A0), Outfit (headings) + Inter (body)
+- **Sections**: Hero, Concept, Benefits, Testimonials, Team & Fees, Registration Form, About Us & News, Footer
+- **CMS integration**: Fetches testimonials, news items, and team members from Strapi CMS via `/api/cms/*` proxy; falls back to hardcoded data if CMS unavailable
+- Entry: `src/pages/Home.tsx`
+- Logo: `public/criskros-logo.png`
+
+### `strapi/` (external, not in pnpm workspace)
+
+Self-hosted Strapi 5 CMS for managing Criskros dynamic content.
+
+- **Port**: 9000 (set in `strapi/.env`)
+- **Database**: SQLite at `strapi/.tmp/data.db`
+- **Workflow**: "Strapi CMS" → `cd strapi && npm run dev`
+- **Content types**: `testimonial`, `news-item`, `team-member`
+- **Bootstrap** (`strapi/src/index.ts`): Auto-sets public permissions for all three content types and seeds initial data on first start
+- **Admin panel**: accessible at `/admin` on the Strapi port
+- **IMPORTANT**: Use `npm` (not pnpm) inside the `strapi/` directory to avoid workspace conflicts
+
+### API Server CMS Proxy
+
+Route `artifacts/api-server/src/routes/cms.ts` proxies `/api/cms/*` → Strapi at `http://localhost:9000`.
+This allows the frontend to call `/api/cms/api/testimonials` etc. without CORS issues.

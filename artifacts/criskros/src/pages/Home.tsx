@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import { Navbar } from "@/components/Navbar"
 import { RegistrationForm } from "@/components/RegistrationForm"
@@ -30,7 +31,62 @@ const staggerContainer = {
   }
 }
 
+const FALLBACK_TESTIMONIALS = [
+  { name: "Rajesh Mehta", quote: "Criskros transformed our annual sports day into something truly exceptional. The multi-sport format pushed every team member out of their comfort zone.", designation: "HR Director", company: "TechVision India" },
+  { name: "Priya Nair", quote: "We had 7 people from completely different departments come together and win. Criskros is not just sport — it's the best team-building experience we've had in years.", designation: "CEO", company: "Nexus Solutions" },
+  { name: "Arun Sharma", quote: "The concept of smart sports is brilliant. Strategy and fitness combined — it levels the playing field and makes everyone feel they can contribute meaningfully.", designation: "Operations Head", company: "Pinnacle Corp" },
+];
+
+const FALLBACK_NEWS = [
+  { title: "Criskros Season 1 Registration Now Open", date: "March 1, 2026", description: "We are thrilled to announce that registrations for the inaugural Criskros season are now open. Teams from across India are invited to participate.", category: "Announcement" },
+  { title: "What Makes Criskros Different from Regular Sports Days", date: "Feb 15, 2026", description: "Unlike traditional corporate sports events, Criskros combines multiple disciplines with strategy and team dynamics. Here's a deep dive.", category: "Feature" },
+  { title: "Venue Announcement: Season 1 Location Confirmed", date: "Feb 1, 2026", description: "We are pleased to announce the venue for the first Criskros event. A world-class multi-sport facility has been confirmed.", category: "Event Update" },
+];
+
+const FALLBACK_TEAM = [
+  { name: "Vikram Anand", role: "Founder & CEO", memberType: "management" },
+  { name: "Sunita Reddy", role: "Co-Founder & COO", memberType: "management" },
+  { name: "Kiran Patel", role: "Head of Partnerships", memberType: "management" },
+];
+
+const FALLBACK_MENTORS = [
+  { name: "Dr. Arvind Rao", role: "Sports Science Advisor", memberType: "mentor" },
+  { name: "Meena Krishnan", role: "Business Strategy Advisor", memberType: "advisor" },
+];
+
 export default function Home() {
+  const [testimonials, setTestimonials] = useState(FALLBACK_TESTIMONIALS);
+  const [news, setNews] = useState(FALLBACK_NEWS);
+  const [management, setManagement] = useState(FALLBACK_TEAM);
+  const [mentors, setMentors] = useState(FALLBACK_MENTORS);
+
+  useEffect(() => {
+    fetch('/api/cms/api/testimonials?publicationState=live')
+      .then(r => r.json())
+      .then(({ data }) => { if (data?.length) setTestimonials(data.map((d: any) => d)); })
+      .catch(() => {});
+
+    fetch('/api/cms/api/news-items?sort=date:desc&publicationState=live')
+      .then(r => r.json())
+      .then(({ data }) => {
+        if (data?.length) setNews(data.map((d: any) => ({
+          ...d,
+          date: d.date ? new Date(d.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : '',
+        })));
+      })
+      .catch(() => {});
+
+    fetch('/api/cms/api/team-members?sort=order:asc&publicationState=live')
+      .then(r => r.json())
+      .then(({ data }) => {
+        if (data?.length) {
+          setManagement(data.filter((d: any) => d.memberType === 'management'));
+          setMentors(data.filter((d: any) => d.memberType !== 'management'));
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -247,26 +303,7 @@ export default function Home() {
           </motion.div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            {[
-              {
-                quote: "Criskros transformed how our departments collaborate. The 'smart sports' concept leveled the playing field and brought out the best strategists in our team.",
-                name: "Sarah Jenkins",
-                role: "HR Director",
-                company: "TechFlow Solutions"
-              },
-              {
-                quote: "An impeccably organized event. It provided immense brand visibility for us while giving our employees a weekend they still talk about months later.",
-                name: "David Chen",
-                role: "CEO",
-                company: "Nexus Innovations"
-              },
-              {
-                quote: "We've tried standard team building retreats, but nothing compares to the energy and camaraderie built during the Criskros tournament.",
-                name: "Priya Patel",
-                role: "VP Operations",
-                company: "Global Logistics"
-              }
-            ].map((testimonial, i) => (
+            {testimonials.map((testimonial, i) => (
               <motion.div
                 key={i}
                 initial={{ opacity: 0, y: 20 }}
@@ -287,7 +324,7 @@ export default function Home() {
                   </div>
                   <div>
                     <h5 className="font-bold text-foreground">{testimonial.name}</h5>
-                    <p className="text-sm text-muted-foreground">{testimonial.role}, {testimonial.company}</p>
+                    <p className="text-sm text-muted-foreground">{testimonial.designation || (testimonial as any).role}, {testimonial.company}</p>
                   </div>
                 </div>
               </motion.div>
@@ -447,22 +484,36 @@ export default function Home() {
           <div className="mb-20">
             <h4 className="text-2xl font-bold text-foreground mb-8 text-center">Management Team</h4>
             <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-8">
-              {[
-                { name: "Michael Chang", role: "Event Director", img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=400" },
-                { name: "Jessica Alba", role: "Operations Lead", img: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=400" },
-                { name: "Robert Fox", role: "Corporate Relations", img: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=400" }
-              ].map((member, i) => (
+              {management.map((member, i) => (
                 <div key={i} className="text-center group">
-                  <div className="w-48 h-48 mx-auto rounded-full overflow-hidden mb-6 border-4 border-background shadow-xl group-hover:scale-105 transition-transform duration-300">
-                    {/* professional corporate portrait */}
-                    <img src={member.img} alt={member.name} className="w-full h-full object-cover" />
+                  <div className="w-48 h-48 mx-auto rounded-full overflow-hidden mb-6 border-4 border-background shadow-xl group-hover:scale-105 transition-transform duration-300 bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+                    <span className="text-white font-bold text-5xl">{member.name.charAt(0)}</span>
                   </div>
                   <h5 className="text-xl font-bold text-foreground">{member.name}</h5>
                   <p className="text-accent font-medium">{member.role}</p>
+                  {(member as any).bio && <p className="text-muted-foreground text-sm mt-2 max-w-xs mx-auto">{(member as any).bio}</p>}
                 </div>
               ))}
             </div>
           </div>
+
+          {mentors.length > 0 && (
+            <div className="mb-20">
+              <h4 className="text-2xl font-bold text-foreground mb-8 text-center">Mentors & Advisors</h4>
+              <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-8">
+                {mentors.map((member, i) => (
+                  <div key={i} className="text-center group">
+                    <div className="w-48 h-48 mx-auto rounded-full overflow-hidden mb-6 border-4 border-background shadow-xl group-hover:scale-105 transition-transform duration-300 bg-gradient-to-br from-accent to-primary flex items-center justify-center">
+                      <span className="text-white font-bold text-5xl">{member.name.charAt(0)}</span>
+                    </div>
+                    <h5 className="text-xl font-bold text-foreground">{member.name}</h5>
+                    <p className="text-accent font-medium">{member.role}</p>
+                    {(member as any).bio && <p className="text-muted-foreground text-sm mt-2 max-w-xs mx-auto">{(member as any).bio}</p>}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           <div id="news" className="pt-20 border-t border-border">
             <div className="flex justify-between items-end mb-12">
@@ -474,24 +525,23 @@ export default function Home() {
             </div>
 
             <div className="grid md:grid-cols-3 gap-8">
-              {[
-                { date: "Oct 15, 2023", title: "Registration Opens for Season 3", desc: "Early bird slots are filling fast. Register your corporate team today to secure participation." },
-                { date: "Sep 28, 2023", title: "New Sport Added to Roster", desc: "Pickleball joins the Criskros multi-sport challenge, adding a new strategic dimension." },
-                { date: "Aug 10, 2023", title: "TechFlow Wins Season 2", desc: "A thrilling finish in the final relay saw TechFlow edge out the competition." }
-              ].map((news, i) => (
+              {news.map((item, i) => (
                 <div key={i} className="group cursor-pointer">
                   <div className="aspect-video bg-muted rounded-2xl mb-4 overflow-hidden relative">
-                    {/* sports action abstract */}
-                    <img 
-                      src={`https://images.unsplash.com/photo-${1517649763962 + i * 100}?auto=format&fit=crop&q=80&w=800`} 
-                      alt={news.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                    <div className="w-full h-full bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
+                      <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+                        <Trophy className="w-8 h-8 text-white" />
+                      </div>
+                    </div>
+                    {(item as any).category && (
+                      <div className="absolute top-4 left-4 bg-accent text-white text-xs font-bold px-3 py-1 rounded-full">
+                        {(item as any).category}
+                      </div>
+                    )}
                   </div>
-                  <p className="text-sm font-semibold text-accent mb-2">{news.date}</p>
-                  <h4 className="text-xl font-bold text-foreground mb-2 group-hover:text-primary transition-colors">{news.title}</h4>
-                  <p className="text-muted-foreground line-clamp-2">{news.desc}</p>
+                  <p className="text-sm font-semibold text-accent mb-2">{item.date}</p>
+                  <h4 className="text-xl font-bold text-foreground mb-2 group-hover:text-primary transition-colors">{item.title}</h4>
+                  <p className="text-muted-foreground line-clamp-2">{item.description || (item as any).desc}</p>
                 </div>
               ))}
             </div>
