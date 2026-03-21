@@ -110,7 +110,7 @@ React + Vite single-page website for **Criskros** — a multi-sport corporate te
 Self-hosted Strapi 5 CMS for managing Criskros dynamic content.
 
 - **Port**: 9000 (set in `strapi/.env`)
-- **Database**: SQLite at `strapi/.tmp/data.db`
+- **Database**: PostgreSQL (Replit's built-in DB via `DATABASE_URL`)
 - **Workflow**: "Strapi CMS" → `cd strapi && npm run dev`
 - **Content types**: `testimonial`, `news-item`, `team-member`
 - **Bootstrap** (`strapi/src/index.ts`): Auto-sets public permissions for all three content types and seeds initial data on first start
