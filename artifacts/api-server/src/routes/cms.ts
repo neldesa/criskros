@@ -14,4 +14,18 @@ router.use(
   })
 );
 
+router.use(
+  "/strapi-admin",
+  createProxyMiddleware({
+    target: strapiUrl,
+    changeOrigin: true,
+    pathRewrite: { "^/api/strapi-admin": "" },
+    on: {
+      error: (err, req, res) => {
+        (res as any).status(502).json({ error: "Strapi admin unavailable" });
+      },
+    },
+  })
+);
+
 export default router;
