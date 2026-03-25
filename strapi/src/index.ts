@@ -14,6 +14,7 @@ async function setPublicPermissions(strapi: Core.Strapi) {
     'api::hero-banner.hero-banner',
     'api::concept-section.concept-section',
     'api::concept-item.concept-item',
+    'api::fee-section.fee-section',
   ];
 
   const actions = ['find', 'findOne'];
@@ -195,6 +196,27 @@ async function seedData(strapi: Core.Strapi) {
       const ci = await docs.documents('api::concept-item.concept-item').create({ data: item });
       await docs.documents('api::concept-item.concept-item').publish({ documentId: ci.documentId });
     }
+  }
+
+  // Seed Fee Section using document service
+  const feeSectionDraft = await docs.documents('api::fee-section.fee-section').findFirst({ status: 'draft' });
+  if (!feeSectionDraft) {
+    const fs = await docs.documents('api::fee-section.fee-section').create({
+      data: {
+        sectionLabel: 'Requirements',
+        heading: 'Team & Fees',
+        badgeText: 'Per Team',
+        price: '₹1,50,000',
+        priceUnit: '/ team',
+        teamCompositionHeading: 'Team Composition',
+        teamRules: 'Strictly 7 members per team\nAll members must belong to the same organization\nMix of men and women is highly encouraged',
+        includedItems: 'Tournament entry for 7 players\nPremium custom team jerseys & kits\nAll professional sports equipment\nCatered meals and hydration stations\nAccess to networking gala\nProfessional media coverage of team',
+        ctaText: 'Start Registration',
+        ctaUrl: '#register',
+        description: "Secure your organization's slot in the ultimate tournament.",
+      },
+    });
+    await docs.documents('api::fee-section.fee-section').publish({ documentId: fs.documentId });
   }
 }
 

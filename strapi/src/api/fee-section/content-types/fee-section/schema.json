@@ -1,0 +1,25 @@
+{
+  "kind": "singleType",
+  "collectionName": "fee_sections",
+  "info": {
+    "singularName": "fee-section",
+    "pluralName": "fee-sections",
+    "displayName": "Fee Section"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "sectionLabel": { "type": "string" },
+    "heading": { "type": "string" },
+    "description": { "type": "string" },
+    "badgeText": { "type": "string" },
+    "price": { "type": "string" },
+    "priceUnit": { "type": "string" },
+    "includedItems": { "type": "text" },
+    "teamRules": { "type": "text" },
+    "teamCompositionHeading": { "type": "string" },
+    "ctaText": { "type": "string" },
+    "ctaUrl": { "type": "string" }
+  }
+}

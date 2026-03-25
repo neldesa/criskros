@@ -78,6 +78,20 @@ const FALLBACK_MENTORS = [
   { name: "Meena Krishnan", role: "Business Strategy Advisor", memberType: "advisor" },
 ];
 
+const FALLBACK_FEE_SECTION = {
+  sectionLabel: 'Requirements',
+  heading: 'Team & Fees',
+  badgeText: 'Per Team',
+  price: '₹1,50,000',
+  priceUnit: '/ team',
+  teamCompositionHeading: 'Team Composition',
+  teamRules: 'Strictly 7 members per team\nAll members must belong to the same organization\nMix of men and women is highly encouraged',
+  includedItems: 'Tournament entry for 7 players\nPremium custom team jerseys & kits\nAll professional sports equipment\nCatered meals and hydration stations\nAccess to networking gala\nProfessional media coverage of team',
+  ctaText: 'Start Registration',
+  ctaUrl: '#register',
+  description: "Secure your organization's slot in the ultimate tournament.",
+};
+
 // Icon map for concept items
 const ICON_MAP: Record<string, React.ReactNode> = {
   users: <Users className="w-6 h-6" />,
@@ -96,6 +110,7 @@ export default function Home() {
   const [news, setNews] = useState(FALLBACK_NEWS);
   const [management, setManagement] = useState(FALLBACK_TEAM);
   const [mentors, setMentors] = useState(FALLBACK_MENTORS);
+  const [feeSection, setFeeSection] = useState(FALLBACK_FEE_SECTION);
 
   useEffect(() => {
     fetch('/api/cms/api/hero-banner?publicationState=live')
@@ -136,6 +151,11 @@ export default function Home() {
           setMentors(data.filter((d: any) => d.memberType !== 'management'));
         }
       })
+      .catch(() => {});
+
+    fetch('/api/cms/api/fee-section?publicationState=live')
+      .then(r => r.json())
+      .then(({ data }) => { if (data) setFeeSection(data); })
       .catch(() => {});
   }, []);
 
@@ -386,28 +406,22 @@ export default function Home() {
               viewport={{ once: true }}
               variants={fadeInUp}
             >
-              <h2 className="text-accent font-bold tracking-wider uppercase text-sm mb-2">Requirements</h2>
-              <h3 className="font-display text-4xl md:text-5xl font-bold mb-8">Team & Fees</h3>
+              <h2 className="text-accent font-bold tracking-wider uppercase text-sm mb-2">{feeSection.sectionLabel}</h2>
+              <h3 className="font-display text-4xl md:text-5xl font-bold mb-8">{feeSection.heading}</h3>
               
               <div className="space-y-8 mb-8">
                 <div className="bg-white/10 rounded-2xl p-6 backdrop-blur-sm border border-white/10">
                   <h4 className="text-2xl font-bold mb-4 flex items-center gap-3">
                     <Users className="text-accent" /> 
-                    Team Composition
+                    {feeSection.teamCompositionHeading}
                   </h4>
                   <ul className="space-y-3">
-                    <li className="flex items-start gap-3">
-                      <CheckCircle2 className="w-5 h-5 text-accent shrink-0 mt-0.5" />
-                      <span className="text-blue-50">Strictly 7 members per team</span>
-                    </li>
-                    <li className="flex items-start gap-3">
-                      <CheckCircle2 className="w-5 h-5 text-accent shrink-0 mt-0.5" />
-                      <span className="text-blue-50">All members must belong to the same organization</span>
-                    </li>
-                    <li className="flex items-start gap-3">
-                      <CheckCircle2 className="w-5 h-5 text-accent shrink-0 mt-0.5" />
-                      <span className="text-blue-50">Mix of men and women is highly encouraged</span>
-                    </li>
+                    {(feeSection.teamRules || '').split('\n').filter(Boolean).map((rule, i) => (
+                      <li key={i} className="flex items-start gap-3">
+                        <CheckCircle2 className="w-5 h-5 text-accent shrink-0 mt-0.5" />
+                        <span className="text-blue-50">{rule}</span>
+                      </li>
+                    ))}
                   </ul>
                 </div>
               </div>
@@ -420,27 +434,20 @@ export default function Home() {
               className="bg-card text-card-foreground rounded-3xl p-8 sm:p-10 shadow-2xl relative"
             >
               <div className="absolute top-0 right-8 -translate-y-1/2 bg-accent text-white px-6 py-2 rounded-full font-bold text-sm shadow-lg">
-                Per Team
+                {feeSection.badgeText}
               </div>
               
               <h4 className="font-display text-3xl font-bold mb-2">Participation Fee</h4>
-              <p className="text-muted-foreground mb-6">Secure your organization's slot in the ultimate tournament.</p>
+              <p className="text-muted-foreground mb-6">{feeSection.description}</p>
               
               <div className="flex items-baseline gap-2 mb-8">
-                <span className="text-5xl font-black text-foreground">$1,500</span>
-                <span className="text-muted-foreground font-medium">/ team</span>
+                <span className="text-5xl font-black text-foreground">{feeSection.price}</span>
+                <span className="text-muted-foreground font-medium">{feeSection.priceUnit}</span>
               </div>
 
               <div className="space-y-4 mb-10">
                 <p className="font-bold text-sm uppercase tracking-wider text-muted-foreground">What's Included</p>
-                {[
-                  "Tournament entry for 7 players",
-                  "Premium custom team jerseys & kits",
-                  "All professional sports equipment",
-                  "Catered meals and hydration stations",
-                  "Access to networking gala",
-                  "Professional media coverage of team"
-                ].map((item, i) => (
+                {(feeSection.includedItems || '').split('\n').filter(Boolean).map((item, i) => (
                   <div key={i} className="flex items-center gap-3">
                     <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
                       <CheckCircle2 className="w-3 h-3 text-primary" />
@@ -451,7 +458,7 @@ export default function Home() {
               </div>
 
               <Button size="lg" className="w-full" asChild>
-                <a href="#register">Start Registration</a>
+                <a href={feeSection.ctaUrl}>{feeSection.ctaText}</a>
               </Button>
             </motion.div>
           </div>
