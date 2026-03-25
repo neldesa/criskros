@@ -1,0 +1,73 @@
+services:
+
+  # ── PostgreSQL ───────────────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    restart: always
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-criskros}
+      POSTGRES_USER: ${POSTGRES_USER:-criskros}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-criskros}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── Strapi CMS ───────────────────────────────────────────────────────
+  strapi:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.strapi
+    restart: always
+    environment:
+      DATABASE_CLIENT: postgres
+      DATABASE_URL: postgres://${POSTGRES_USER:-criskros}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-criskros}
+      DATABASE_SSL: "false"
+      APP_KEYS: ${STRAPI_APP_KEYS}
+      API_TOKEN_SALT: ${STRAPI_API_TOKEN_SALT}
+      ADMIN_JWT_SECRET: ${STRAPI_ADMIN_JWT_SECRET}
+      TRANSFER_TOKEN_SALT: ${STRAPI_TRANSFER_TOKEN_SALT}
+      JWT_SECRET: ${STRAPI_JWT_SECRET}
+      STRAPI_ADMIN_BACKEND_URL: https://${DOMAIN}/api/strapi-admin
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - strapi_uploads:/app/public/uploads
+
+  # ── API Server ───────────────────────────────────────────────────────
+  api:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.api
+    restart: always
+    environment:
+      PORT: "8080"
+      DATABASE_URL: postgres://${POSTGRES_USER:-criskros}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-criskros}
+      STRAPI_URL: http://strapi:1337
+      NODE_ENV: production
+    depends_on:
+      postgres:
+        condition: service_healthy
+      strapi:
+        condition: service_started
+
+  # ── Nginx + Frontend ─────────────────────────────────────────────────
+  frontend:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.frontend
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - api
+      - strapi
+
+volumes:
+  postgres_data:
+  strapi_uploads:
