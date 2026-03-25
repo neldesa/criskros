@@ -1,0 +1,37 @@
+{
+  "kind": "collectionType",
+  "collectionName": "concept_items",
+  "info": {
+    "singularName": "concept-item",
+    "pluralName": "concept-items",
+    "displayName": "Concept Item"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "description": {
+      "type": "text",
+      "required": true
+    },
+    "icon": {
+      "type": "enumeration",
+      "enum": ["users", "target", "zap", "trophy", "building2", "trending-up"],
+      "default": "users"
+    },
+    "colorVariant": {
+      "type": "enumeration",
+      "enum": ["primary", "accent"],
+      "default": "primary"
+    },
+    "order": {
+      "type": "integer",
+      "default": 0
+    }
+  }
+}

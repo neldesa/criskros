@@ -11,6 +11,9 @@ async function setPublicPermissions(strapi: Core.Strapi) {
     'api::testimonial.testimonial',
     'api::news-item.news-item',
     'api::team-member.team-member',
+    'api::hero-banner.hero-banner',
+    'api::concept-section.concept-section',
+    'api::concept-item.concept-item',
   ];
 
   const actions = ['find', 'findOne'];
@@ -144,6 +147,72 @@ async function seedData(strapi: Core.Strapi) {
     ];
     for (const m of members) {
       await strapi.query('api::team-member.team-member').create({ data: m });
+    }
+  }
+
+  // Seed Hero Banner (single type)
+  const heroBanner = await strapi.query('api::hero-banner.hero-banner').findOne({});
+  if (!heroBanner) {
+    await strapi.query('api::hero-banner.hero-banner').create({
+      data: {
+        headline: 'The Ultimate Smart Sports Experience',
+        highlightText: 'Smart Sports',
+        subheadline: 'Where corporate teams battle across multiple sports disciplines. It\'s not just about athletic prowess—it\'s about strategy, teamwork, and dynamic execution.',
+        primaryCtaText: 'Register Your Team',
+        primaryCtaUrl: '#register',
+        secondaryCtaText: 'Watch Trailer',
+        secondaryCtaUrl: '#concept',
+        publishedAt: new Date(),
+      },
+    });
+  }
+
+  // Seed Concept Section (single type)
+  const conceptSection = await strapi.query('api::concept-section.concept-section').findOne({});
+  if (!conceptSection) {
+    await strapi.query('api::concept-section.concept-section').create({
+      data: {
+        sectionLabel: 'The Concept',
+        heading: 'What is Criskros?',
+        description: 'Criskros is an innovative multi-sport team event designed exclusively for organizations and corporates.',
+        imageQuote: 'More than a game. It\'s a movement.',
+        imageUrl: 'https://images.unsplash.com/photo-1526232761682-d26e03ac148e?auto=format&fit=crop&q=80&w=1000',
+        publishedAt: new Date(),
+      },
+    });
+  }
+
+  // Seed Concept Items
+  const conceptItemCount = await strapi.query('api::concept-item.concept-item').count({});
+  if (conceptItemCount === 0) {
+    const items = [
+      {
+        title: 'Team of 7',
+        description: 'Teams consist of exactly 7 members representing their organization. A mix of men and women is highly encouraged.',
+        icon: 'users',
+        colorVariant: 'primary',
+        order: 1,
+        publishedAt: new Date(),
+      },
+      {
+        title: 'Multi-Disciplinary',
+        description: 'Compete across diverse sports disciplines. No single sport defines the champion.',
+        icon: 'target',
+        colorVariant: 'accent',
+        order: 2,
+        publishedAt: new Date(),
+      },
+      {
+        title: 'Smart Sports',
+        description: 'It rewards strategy, team dynamics, and adaptability just as much as pure athletic strength.',
+        icon: 'zap',
+        colorVariant: 'primary',
+        order: 3,
+        publishedAt: new Date(),
+      },
+    ];
+    for (const item of items) {
+      await strapi.query('api::concept-item.concept-item').create({ data: item });
     }
   }
 }

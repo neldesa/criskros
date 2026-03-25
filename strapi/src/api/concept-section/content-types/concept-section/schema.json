@@ -1,0 +1,31 @@
+{
+  "kind": "singleType",
+  "collectionName": "concept_sections",
+  "info": {
+    "singularName": "concept-section",
+    "pluralName": "concept-sections",
+    "displayName": "Concept Section"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "sectionLabel": {
+      "type": "string"
+    },
+    "heading": {
+      "type": "string",
+      "required": true
+    },
+    "description": {
+      "type": "text"
+    },
+    "imageQuote": {
+      "type": "string"
+    },
+    "imageUrl": {
+      "type": "string"
+    }
+  }
+}

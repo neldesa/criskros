@@ -31,6 +31,30 @@ const staggerContainer = {
   }
 }
 
+const FALLBACK_HERO = {
+  headline: 'The Ultimate Smart Sports Experience',
+  highlightText: 'Smart Sports',
+  subheadline: "Where corporate teams battle across multiple sports disciplines. It's not just about athletic prowess—it's about strategy, teamwork, and dynamic execution.",
+  primaryCtaText: 'Register Your Team',
+  primaryCtaUrl: '#register',
+  secondaryCtaText: 'Watch Trailer',
+  secondaryCtaUrl: '#concept',
+};
+
+const FALLBACK_CONCEPT_SECTION = {
+  sectionLabel: 'The Concept',
+  heading: 'What is Criskros?',
+  description: 'Criskros is an innovative multi-sport team event designed exclusively for organizations and corporates.',
+  imageQuote: "More than a game. It's a movement.",
+  imageUrl: 'https://images.unsplash.com/photo-1526232761682-d26e03ac148e?auto=format&fit=crop&q=80&w=1000',
+};
+
+const FALLBACK_CONCEPT_ITEMS = [
+  { title: 'Team of 7', description: 'Teams consist of exactly 7 members representing their organization. A mix of men and women is highly encouraged.', icon: 'users', colorVariant: 'primary', order: 1 },
+  { title: 'Multi-Disciplinary', description: 'Compete across diverse sports disciplines. No single sport defines the champion.', icon: 'target', colorVariant: 'accent', order: 2 },
+  { title: 'Smart Sports', description: 'It rewards strategy, team dynamics, and adaptability just as much as pure athletic strength.', icon: 'zap', colorVariant: 'primary', order: 3 },
+];
+
 const FALLBACK_TESTIMONIALS = [
   { name: "Rajesh Mehta", quote: "Criskros transformed our annual sports day into something truly exceptional. The multi-sport format pushed every team member out of their comfort zone.", designation: "HR Director", company: "TechVision India" },
   { name: "Priya Nair", quote: "We had 7 people from completely different departments come together and win. Criskros is not just sport — it's the best team-building experience we've had in years.", designation: "CEO", company: "Nexus Solutions" },
@@ -54,13 +78,41 @@ const FALLBACK_MENTORS = [
   { name: "Meena Krishnan", role: "Business Strategy Advisor", memberType: "advisor" },
 ];
 
+// Icon map for concept items
+const ICON_MAP: Record<string, React.ReactNode> = {
+  users: <Users className="w-6 h-6" />,
+  target: <Target className="w-6 h-6" />,
+  zap: <Zap className="w-6 h-6" />,
+  trophy: <Trophy className="w-6 h-6" />,
+  building2: <Building2 className="w-6 h-6" />,
+  'trending-up': <TrendingUp className="w-6 h-6" />,
+};
+
 export default function Home() {
+  const [hero, setHero] = useState(FALLBACK_HERO);
+  const [conceptSection, setConceptSection] = useState(FALLBACK_CONCEPT_SECTION);
+  const [conceptItems, setConceptItems] = useState(FALLBACK_CONCEPT_ITEMS);
   const [testimonials, setTestimonials] = useState(FALLBACK_TESTIMONIALS);
   const [news, setNews] = useState(FALLBACK_NEWS);
   const [management, setManagement] = useState(FALLBACK_TEAM);
   const [mentors, setMentors] = useState(FALLBACK_MENTORS);
 
   useEffect(() => {
+    fetch('/api/cms/api/hero-banner?publicationState=live')
+      .then(r => r.json())
+      .then(({ data }) => { if (data) setHero(data); })
+      .catch(() => {});
+
+    fetch('/api/cms/api/concept-section?publicationState=live')
+      .then(r => r.json())
+      .then(({ data }) => { if (data) setConceptSection(data); })
+      .catch(() => {});
+
+    fetch('/api/cms/api/concept-items?sort=order:asc&publicationState=live')
+      .then(r => r.json())
+      .then(({ data }) => { if (data?.length) setConceptItems(data); })
+      .catch(() => {});
+
     fetch('/api/cms/api/testimonials?publicationState=live')
       .then(r => r.json())
       .then(({ data }) => { if (data?.length) setTestimonials(data.map((d: any) => d)); })
@@ -114,7 +166,15 @@ export default function Home() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
             >
-              The Ultimate <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent to-pink-300">Smart Sports</span> Experience
+              {hero.highlightText
+                ? hero.headline.split(hero.highlightText)[0]
+                : hero.headline}
+              {hero.highlightText && (
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent to-pink-300">
+                  {hero.highlightText}
+                </span>
+              )}
+              {hero.highlightText && hero.headline.split(hero.highlightText)[1]}
             </motion.h1>
             
             <motion.p 
@@ -123,7 +183,7 @@ export default function Home() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.4 }}
             >
-              Where corporate teams battle across multiple sports disciplines. It's not just about athletic prowess—it's about strategy, teamwork, and dynamic execution.
+              {hero.subheadline}
             </motion.p>
             
             <motion.div 
@@ -133,12 +193,12 @@ export default function Home() {
               transition={{ duration: 0.6, delay: 0.6 }}
             >
               <Button size="lg" variant="gradient" asChild className="text-lg px-8 rounded-full h-14">
-                <a href="#register">Register Your Team</a>
+                <a href={hero.primaryCtaUrl}>{hero.primaryCtaText}</a>
               </Button>
               <Button size="lg" variant="outline" asChild className="text-lg px-8 rounded-full h-14 border-white/30 text-white hover:bg-white/10 hover:text-white backdrop-blur-sm">
-                <a href="#concept">
+                <a href={hero.secondaryCtaUrl}>
                   <PlayCircle className="mr-2 h-5 w-5" />
-                  Watch Trailer
+                  {hero.secondaryCtaText}
                 </a>
               </Button>
             </motion.div>
@@ -163,10 +223,10 @@ export default function Home() {
             variants={fadeInUp}
             className="text-center max-w-3xl mx-auto mb-16"
           >
-            <h2 className="text-primary font-bold tracking-wider uppercase text-sm mb-2">The Concept</h2>
-            <h3 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-6">What is Criskros?</h3>
+            <h2 className="text-primary font-bold tracking-wider uppercase text-sm mb-2">{conceptSection.sectionLabel}</h2>
+            <h3 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-6">{conceptSection.heading}</h3>
             <p className="text-lg text-muted-foreground">
-              Criskros is an innovative multi-sport team event designed exclusively for organizations and corporates.
+              {conceptSection.description}
             </p>
           </motion.div>
 
@@ -178,35 +238,19 @@ export default function Home() {
               variants={fadeInUp}
               className="space-y-8"
             >
-              <div className="flex gap-4">
-                <div className="flex-shrink-0 w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center">
-                  <Users className="w-6 h-6 text-primary" />
+              {conceptItems.map((item, idx) => (
+                <div key={idx} className="flex gap-4">
+                  <div className={`flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center ${item.colorVariant === 'accent' ? 'bg-accent/10' : 'bg-primary/10'}`}>
+                    <span className={item.colorVariant === 'accent' ? 'text-accent' : 'text-primary'}>
+                      {ICON_MAP[item.icon] ?? <Zap className="w-6 h-6" />}
+                    </span>
+                  </div>
+                  <div>
+                    <h4 className="text-xl font-bold text-foreground mb-2">{item.title}</h4>
+                    <p className="text-muted-foreground">{item.description}</p>
+                  </div>
                 </div>
-                <div>
-                  <h4 className="text-xl font-bold text-foreground mb-2">Team of 7</h4>
-                  <p className="text-muted-foreground">Teams consist of exactly 7 members representing their organization. A mix of men and women is highly encouraged.</p>
-                </div>
-              </div>
-              
-              <div className="flex gap-4">
-                <div className="flex-shrink-0 w-12 h-12 bg-accent/10 rounded-xl flex items-center justify-center">
-                  <Target className="w-6 h-6 text-accent" />
-                </div>
-                <div>
-                  <h4 className="text-xl font-bold text-foreground mb-2">Multi-Disciplinary</h4>
-                  <p className="text-muted-foreground">Compete across diverse sports disciplines. No single sport defines the champion.</p>
-                </div>
-              </div>
-
-              <div className="flex gap-4">
-                <div className="flex-shrink-0 w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center">
-                  <Zap className="w-6 h-6 text-primary" />
-                </div>
-                <div>
-                  <h4 className="text-xl font-bold text-foreground mb-2">Smart Sports</h4>
-                  <p className="text-muted-foreground">It rewards strategy, team dynamics, and adaptability just as much as pure athletic strength.</p>
-                </div>
-              </div>
+              ))}
             </motion.div>
 
             <motion.div 
@@ -217,14 +261,13 @@ export default function Home() {
               className="relative"
             >
               <div className="aspect-square md:aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl relative">
-                {/* team huddle high five sports */}
                 <img 
-                  src="https://images.unsplash.com/photo-1526232761682-d26e03ac148e?auto=format&fit=crop&q=80&w=1000" 
+                  src={conceptSection.imageUrl || 'https://images.unsplash.com/photo-1526232761682-d26e03ac148e?auto=format&fit=crop&q=80&w=1000'} 
                   alt="Team Huddle" 
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-primary/80 to-transparent flex items-end p-8">
-                  <p className="text-white font-display text-2xl font-bold">More than a game. It's a movement.</p>
+                  <p className="text-white font-display text-2xl font-bold">{conceptSection.imageQuote}</p>
                 </div>
               </div>
               {/* Decorative block */}
