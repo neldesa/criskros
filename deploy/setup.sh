@@ -1,83 +1,144 @@
 #!/bin/bash
 set -e
 
-# ── Criskros — Linode Fresh Server Setup ────────────────────────────────
-# Run this script as root on a fresh Ubuntu 22.04 Linode:
+# ── Criskros — Linode Multi-Instance Setup Script ───────────────────────
+# Supports running multiple projects on the same server.
+# Each project gets its own isolated Docker stack; Traefik handles routing.
+#
+# Run as root on a fresh Ubuntu 22.04 Linode:
 #   bash setup.sh
 # ────────────────────────────────────────────────────────────────────────
 
-echo "==> Updating system packages..."
-apt-get update -y && apt-get upgrade -y
+# ── Step 1: Install Docker ───────────────────────────────────────────────
+if ! command -v docker &> /dev/null; then
+  echo "==> Installing Docker..."
+  apt-get update -y && apt-get install -y ca-certificates curl gnupg git
 
-echo "==> Installing Docker..."
-apt-get install -y ca-certificates curl gnupg lsb-release git
+  install -m 0755 -d /etc/apt/keyrings
+  curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+  chmod a+r /etc/apt/keyrings/docker.gpg
 
-install -m 0755 -d /etc/apt/keyrings
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-chmod a+r /etc/apt/keyrings/docker.gpg
+  echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] \
+    https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" \
+    | tee /etc/apt/sources.list.d/docker.list > /dev/null
 
-echo \
-  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] \
-  https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" \
-  | tee /etc/apt/sources.list.d/docker.list > /dev/null
+  apt-get update -y
+  apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+  echo "==> Docker installed: $(docker --version)"
+else
+  echo "==> Docker already installed: $(docker --version)"
+fi
 
-apt-get update -y
-apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+# ── Step 2: Start shared Traefik proxy (once per server) ─────────────────
+PROXY_DIR="/opt/proxy"
 
-echo "==> Docker installed: $(docker --version)"
-echo "==> Docker Compose installed: $(docker compose version)"
+if docker network inspect proxy &> /dev/null; then
+  echo "==> Shared proxy network already exists — skipping Traefik setup."
+else
+  echo ""
+  echo "==> Setting up shared Traefik reverse proxy (runs once per server)..."
+  echo "    Enter your email for SSL certificate notifications:"
+  read -r ACME_EMAIL
 
-# ── Clone the project ────────────────────────────────────────────────────
+  mkdir -p "$PROXY_DIR"
+  cat > "$PROXY_DIR/docker-compose.yml" << 'PROXY_COMPOSE'
+services:
+  traefik:
+    image: traefik:v3
+    restart: always
+    command:
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.letsencrypt.acme.httpchallenge=true"
+      - "--certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web"
+      - "--certificatesresolvers.letsencrypt.acme.email=${ACME_EMAIL}"
+      - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - letsencrypt:/letsencrypt
+    networks:
+      - proxy
+networks:
+  proxy:
+    name: proxy
+volumes:
+  letsencrypt:
+PROXY_COMPOSE
+
+  echo "ACME_EMAIL=$ACME_EMAIL" > "$PROXY_DIR/.env"
+  docker compose -f "$PROXY_DIR/docker-compose.yml" --env-file "$PROXY_DIR/.env" up -d
+  echo "==> Traefik proxy is running."
+fi
+
+# ── Step 3: Clone this project ───────────────────────────────────────────
 echo ""
-echo "==> Cloning repository..."
+echo "==> Cloning the Criskros repository..."
 echo "    Enter your Git repository URL (e.g. https://github.com/you/criskros.git):"
 read -r REPO_URL
 
-git clone "$REPO_URL" /opt/criskros
-cd /opt/criskros
+echo "    Enter the folder name for this instance (e.g. criskros or criskros-staging):"
+read -r PROJECT_FOLDER
 
-# ── Create .env file ─────────────────────────────────────────────────────
+INSTALL_DIR="/opt/$PROJECT_FOLDER"
+git clone "$REPO_URL" "$INSTALL_DIR"
+cd "$INSTALL_DIR"
+
+# ── Step 4: Generate .env with secrets ───────────────────────────────────
 echo ""
-echo "==> Setting up environment variables..."
-cp deploy/.env.example deploy/.env
-
-echo ""
-echo "    Generating secrets automatically..."
-PG_PASS=$(openssl rand -base64 32 | tr -d '=+/' | head -c 32)
-KEY1=$(node -e "console.log(require('crypto').randomBytes(16).toString('base64'))" 2>/dev/null || openssl rand -base64 16)
-KEY2=$(node -e "console.log(require('crypto').randomBytes(16).toString('base64'))" 2>/dev/null || openssl rand -base64 16)
-KEY3=$(node -e "console.log(require('crypto').randomBytes(16).toString('base64'))" 2>/dev/null || openssl rand -base64 16)
-KEY4=$(node -e "console.log(require('crypto').randomBytes(16).toString('base64'))" 2>/dev/null || openssl rand -base64 16)
-API_SALT=$(openssl rand -base64 32 | tr -d '=+/')
-ADMIN_JWT=$(openssl rand -base64 32 | tr -d '=+/')
-TRANSFER_SALT=$(openssl rand -base64 32 | tr -d '=+/')
-JWT_SECRET=$(openssl rand -base64 32 | tr -d '=+/')
-
-echo "    Enter your domain (e.g. www.criskros.com):"
+echo "==> Configuring environment..."
+echo "    Enter the domain for this instance (e.g. www.criskros.com):"
 read -r DOMAIN
 
-sed -i "s|DOMAIN=www.criskros.com|DOMAIN=$DOMAIN|" deploy/.env
-sed -i "s|CHANGE_ME_STRONG_PASSWORD|$PG_PASS|" deploy/.env
-sed -i "s|STRAPI_APP_KEYS=key1==,key2==,key3==,key4==|STRAPI_APP_KEYS=$KEY1,$KEY2,$KEY3,$KEY4|" deploy/.env
-sed -i "s|STRAPI_API_TOKEN_SALT=CHANGE_ME|STRAPI_API_TOKEN_SALT=$API_SALT|" deploy/.env
-sed -i "s|STRAPI_ADMIN_JWT_SECRET=CHANGE_ME|STRAPI_ADMIN_JWT_SECRET=$ADMIN_JWT|" deploy/.env
-sed -i "s|STRAPI_TRANSFER_TOKEN_SALT=CHANGE_ME|STRAPI_TRANSFER_TOKEN_SALT=$TRANSFER_SALT|" deploy/.env
-sed -i "s|STRAPI_JWT_SECRET=CHANGE_ME|STRAPI_JWT_SECRET=$JWT_SECRET|" deploy/.env
+echo "    Enter a project name (lowercase, no spaces — used to namespace containers, e.g. criskros):"
+read -r PROJECT_NAME
 
+PG_PASS=$(openssl rand -base64 32 | tr -d '=+/' | head -c 32)
+K1=$(openssl rand -base64 16); K2=$(openssl rand -base64 16)
+K3=$(openssl rand -base64 16); K4=$(openssl rand -base64 16)
+API_SALT=$(openssl rand -base64 32 | tr -d '=+/')
+ADMIN_JWT=$(openssl rand -base64 32 | tr -d '=+/')
+TRANSFER=$(openssl rand -base64 32 | tr -d '=+/')
+JWT=$(openssl rand -base64 32 | tr -d '=+/')
+
+cat > deploy/.env << ENV
+COMPOSE_PROJECT_NAME=$PROJECT_NAME
+DOMAIN=$DOMAIN
+
+POSTGRES_DB=$PROJECT_NAME
+POSTGRES_USER=$PROJECT_NAME
+POSTGRES_PASSWORD=$PG_PASS
+
+STRAPI_APP_KEYS=$K1,$K2,$K3,$K4
+STRAPI_API_TOKEN_SALT=$API_SALT
+STRAPI_ADMIN_JWT_SECRET=$ADMIN_JWT
+STRAPI_TRANSFER_TOKEN_SALT=$TRANSFER
+STRAPI_JWT_SECRET=$JWT
+ENV
+
+echo "==> .env created with auto-generated secrets."
+
+# ── Step 5: Build and start ───────────────────────────────────────────────
 echo ""
-echo "==> Building and starting all services (this will take ~5-10 minutes)..."
+echo "==> Building and starting $PROJECT_NAME (this takes ~5-10 minutes)..."
 docker compose -f deploy/docker-compose.yml --env-file deploy/.env up -d --build
 
 echo ""
 echo "========================================================"
-echo "  Criskros is now live!"
+echo "  $PROJECT_NAME is now live!"
 echo ""
-echo "  Website:       http://$DOMAIN  (or http://$(curl -s ifconfig.me))"
-echo "  Strapi Admin:  http://$DOMAIN/admin/"
+echo "  Website:       https://$DOMAIN"
+echo "  Strapi Admin:  https://$DOMAIN/admin/"
+echo "  Server IP:     $(curl -s ifconfig.me)"
 echo ""
-echo "  Next steps:"
-echo "  1. Point your DNS A record for $DOMAIN to: $(curl -s ifconfig.me)"
-echo "  2. Visit /admin/ to create your Strapi admin account"
-echo "  3. (Optional) Add SSL with: apt install certbot"
-echo "     certbot --nginx -d $DOMAIN"
+echo "  DNS: Add an A record for $DOMAIN → $(curl -s ifconfig.me)"
+echo ""
+echo "  To add another project later, just run this script again."
+echo "  Traefik will already be running — it will be skipped."
 echo "========================================================"
