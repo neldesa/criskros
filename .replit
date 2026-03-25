@@ -30,13 +30,13 @@ args = "Strapi CMS"
 name = "Strapi CMS"
 author = "agent"
 
+[workflows.workflow.metadata]
+outputType = "console"
+
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "cd strapi && npm run dev"
+args = "cd strapi && npm run start"
 waitForPort = 9000
-
-[workflows.workflow.metadata]
-outputType = "webview"
 
 [agent]
 stack = "PNPM_WORKSPACE"
