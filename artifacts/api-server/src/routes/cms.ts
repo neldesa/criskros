@@ -1,5 +1,5 @@
 import { Router, type IRouter } from "express";
-import { createProxyMiddleware } from "http-proxy-middleware";
+import { createProxyMiddleware, fixRequestBody } from "http-proxy-middleware";
 
 const router: IRouter = Router();
 
@@ -11,6 +11,9 @@ router.use(
     target: strapiUrl,
     changeOrigin: true,
     pathRewrite: { "^/api/cms": "" },
+    on: {
+      proxyReq: fixRequestBody,
+    },
   })
 );
 
@@ -21,6 +24,7 @@ router.use(
     changeOrigin: true,
     pathRewrite: { "^/api/strapi-admin": "" },
     on: {
+      proxyReq: fixRequestBody,
       error: (err, req, res) => {
         (res as any).status(502).json({ error: "Strapi admin unavailable" });
       },
@@ -37,6 +41,7 @@ adminRouter.use(
     changeOrigin: true,
     pathRewrite: { "^/": "/admin/" },
     on: {
+      proxyReq: fixRequestBody,
       error: (err, req, res) => {
         (res as any).status(502).json({ error: "Strapi admin unavailable" });
       },
