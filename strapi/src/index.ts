@@ -150,10 +150,11 @@ async function seedData(strapi: Core.Strapi) {
     }
   }
 
-  // Seed Hero Banner (single type)
-  const heroBanner = await strapi.query('api::hero-banner.hero-banner').findOne({});
-  if (!heroBanner) {
-    await strapi.query('api::hero-banner.hero-banner').create({
+  // Seed Hero Banner using document service (creates draft + publishes, so admin shows data)
+  const docs = strapi as any;
+  const heroBannerDraft = await docs.documents('api::hero-banner.hero-banner').findFirst({ status: 'draft' });
+  if (!heroBannerDraft) {
+    const hb = await docs.documents('api::hero-banner.hero-banner').create({
       data: {
         headline: 'The Ultimate Smart Sports Experience',
         highlightText: 'Smart Sports',
@@ -162,57 +163,37 @@ async function seedData(strapi: Core.Strapi) {
         primaryCtaUrl: '#register',
         secondaryCtaText: 'Watch Trailer',
         secondaryCtaUrl: '#concept',
-        publishedAt: new Date(),
       },
     });
+    await docs.documents('api::hero-banner.hero-banner').publish({ documentId: hb.documentId });
   }
 
-  // Seed Concept Section (single type)
-  const conceptSection = await strapi.query('api::concept-section.concept-section').findOne({});
-  if (!conceptSection) {
-    await strapi.query('api::concept-section.concept-section').create({
+  // Seed Concept Section using document service
+  const conceptSectionDraft = await docs.documents('api::concept-section.concept-section').findFirst({ status: 'draft' });
+  if (!conceptSectionDraft) {
+    const cs = await docs.documents('api::concept-section.concept-section').create({
       data: {
         sectionLabel: 'The Concept',
         heading: 'What is Criskros?',
         description: 'Criskros is an innovative multi-sport team event designed exclusively for organizations and corporates.',
         imageQuote: 'More than a game. It\'s a movement.',
         imageUrl: 'https://images.unsplash.com/photo-1526232761682-d26e03ac148e?auto=format&fit=crop&q=80&w=1000',
-        publishedAt: new Date(),
       },
     });
+    await docs.documents('api::concept-section.concept-section').publish({ documentId: cs.documentId });
   }
 
-  // Seed Concept Items
+  // Seed Concept Items using document service
   const conceptItemCount = await strapi.query('api::concept-item.concept-item').count({});
   if (conceptItemCount === 0) {
     const items = [
-      {
-        title: 'Team of 7',
-        description: 'Teams consist of exactly 7 members representing their organization. A mix of men and women is highly encouraged.',
-        icon: 'users',
-        colorVariant: 'primary',
-        order: 1,
-        publishedAt: new Date(),
-      },
-      {
-        title: 'Multi-Disciplinary',
-        description: 'Compete across diverse sports disciplines. No single sport defines the champion.',
-        icon: 'target',
-        colorVariant: 'accent',
-        order: 2,
-        publishedAt: new Date(),
-      },
-      {
-        title: 'Smart Sports',
-        description: 'It rewards strategy, team dynamics, and adaptability just as much as pure athletic strength.',
-        icon: 'zap',
-        colorVariant: 'primary',
-        order: 3,
-        publishedAt: new Date(),
-      },
+      { title: 'Team of 7', description: 'Teams consist of exactly 7 members representing their organization. A mix of men and women is highly encouraged.', icon: 'users', colorVariant: 'primary', order: 1 },
+      { title: 'Multi-Disciplinary', description: 'Compete across diverse sports disciplines. No single sport defines the champion.', icon: 'target', colorVariant: 'accent', order: 2 },
+      { title: 'Smart Sports', description: 'It rewards strategy, team dynamics, and adaptability just as much as pure athletic strength.', icon: 'zap', colorVariant: 'primary', order: 3 },
     ];
     for (const item of items) {
-      await strapi.query('api::concept-item.concept-item').create({ data: item });
+      const ci = await docs.documents('api::concept-item.concept-item').create({ data: item });
+      await docs.documents('api::concept-item.concept-item').publish({ documentId: ci.documentId });
     }
   }
 }
