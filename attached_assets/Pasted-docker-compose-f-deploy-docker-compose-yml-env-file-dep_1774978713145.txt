@@ -1,0 +1,80 @@
+docker compose -f deploy/docker-compose.yml --env-file deploy/.env build --progress plain frontend 2>&1 | tail -80
+
+#14 [builder 7/8] RUN pnpm install --frozen-lockfile
+#14 CACHED
+
+#15 [builder 8/8] RUN BASE_PATH=/ PORT=3000 pnpm --filter @workspace/criskros run build
+#15 0.321 
+#15 0.321 > @workspace/criskros@0.0.0 build /app/artifacts/criskros
+#15 0.321 > vite build --config vite.config.ts
+#15 0.321 
+#15 0.455 /app/node_modules/.pnpm/rollup@4.59.0/node_modules/rollup/dist/native.js:115
+#15 0.455               throw new Error(
+#15 0.455                     ^
+#15 0.455 
+#15 0.455 Error: Cannot find module @rollup/rollup-linux-x64-musl. npm has a bug related to optional dependencies (https://github.com/npm/cli/issues/4828). Please try `npm i` again after removing both package-lock.json and node_modules directory.
+#15 0.455     at requireWithFriendlyError (/app/node_modules/.pnpm/rollup@4.59.0/node_modules/rollup/dist/native.js:115:9)
+#15 0.455     at Object.<anonymous> (/app/node_modules/.pnpm/rollup@4.59.0/node_modules/rollup/dist/native.js:124:76)
+#15 0.455     at Module._compile (node:internal/modules/cjs/loader:1705:14)
+#15 0.455     at Object..js (node:internal/modules/cjs/loader:1838:10)
+#15 0.455     at Module.load (node:internal/modules/cjs/loader:1441:32)
+#15 0.455     at Function._load (node:internal/modules/cjs/loader:1263:12)
+#15 0.455     at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+#15 0.455     at wrapModuleLoad (node:internal/modules/cjs/loader:237:24)
+#15 0.455     at cjsLoader (node:internal/modules/esm/translators:309:5)
+#15 0.455     at ModuleWrap.<anonymous> (node:internal/modules/esm/translators:202:7) {
+#15 0.455   [cause]: Error: Cannot find module '@rollup/rollup-linux-x64-musl'
+#15 0.455   Require stack:
+#15 0.455   - /app/node_modules/.pnpm/rollup@4.59.0/node_modules/rollup/dist/native.js
+#15 0.455       at Function._resolveFilename (node:internal/modules/cjs/loader:1383:15)
+#15 0.455       at defaultResolveImpl (node:internal/modules/cjs/loader:1025:19)
+#15 0.455       at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1030:22)
+#15 0.455       at Function._load (node:internal/modules/cjs/loader:1192:37)
+#15 0.455       at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+#15 0.455       at wrapModuleLoad (node:internal/modules/cjs/loader:237:24)
+#15 0.455       at Module.require (node:internal/modules/cjs/loader:1463:12)
+#15 0.455       at require (node:internal/modules/helpers:147:16)
+#15 0.455       at requireWithFriendlyError (/app/node_modules/.pnpm/rollup@4.59.0/node_modules/rollup/dist/native.js:97:10)
+#15 0.455       at Object.<anonymous> (/app/node_modules/.pnpm/rollup@4.59.0/node_modules/rollup/dist/native.js:124:76) {
+#15 0.455     code: 'MODULE_NOT_FOUND',
+#15 0.455     requireStack: [
+#15 0.455       '/app/node_modules/.pnpm/rollup@4.59.0/node_modules/rollup/dist/native.js'
+#15 0.455     ]
+#15 0.455   }
+#15 0.455 }
+#15 0.456 
+#15 0.456 Node.js v22.22.2
+#15 0.477 /app/artifacts/criskros:
+#15 0.477  ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  @workspace/criskros@0.0.0 build: `vite build --config vite.config.ts`
+#15 0.477 Exit status 1
+#15 ERROR: process "/bin/sh -c BASE_PATH=/ PORT=3000 pnpm --filter @workspace/criskros run build" did not complete successfully: exit code: 1
+------
+ > [builder 8/8] RUN BASE_PATH=/ PORT=3000 pnpm --filter @workspace/criskros run build:
+0.455     requireStack: [
+0.455       '/app/node_modules/.pnpm/rollup@4.59.0/node_modules/rollup/dist/native.js'
+0.455     ]
+0.455   }
+0.455 }
+0.456 
+0.456 Node.js v22.22.2
+0.477 /app/artifacts/criskros:
+0.477  ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  @workspace/criskros@0.0.0 build: `vite build --config vite.config.ts`
+0.477 Exit status 1
+------
+Dockerfile.frontend:16
+
+--------------------
+
+  14 |     
+
+  15 |     # Build the frontend (BASE_PATH=/ for production root deployment)
+
+  16 | >>> RUN BASE_PATH=/ PORT=3000 pnpm --filter @workspace/criskros run build
+
+  17 |     
+
+  18 |     # ---- Serve stage ----
+
+--------------------
+
+failed to solve: process "/bin/sh -c BASE_PATH=/ PORT=3000 pnpm --filter @workspace/criskros run build" did not complete successfully: exit code: 1
