@@ -6,7 +6,7 @@ RUN corepack enable
 WORKDIR /app
 
 # Install dependencies using workspace lockfile
-COPY pnpm-workspace.yaml package.json pnpm-lock.yaml .npmrc ./
+COPY pnpm-workspace.yaml package.json pnpm-lock.yaml .npmrc tsconfig.base.json ./
 COPY lib/ ./lib/
 COPY artifacts/criskros/ ./artifacts/criskros/
 

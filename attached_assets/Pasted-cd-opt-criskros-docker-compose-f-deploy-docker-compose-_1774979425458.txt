@@ -1,0 +1,61 @@
+cd /opt/criskros
+docker compose -f deploy/docker-compose.yml --env-file deploy/.env build --progress plain --no-cache frontend 2>&1 | tail -60
+#15 [builder 8/8] RUN BASE_PATH=/ PORT=3000 pnpm --filter @workspace/criskros run build
+#15 0.537 
+#15 0.537 > @workspace/criskros@0.0.0 build /app/artifacts/criskros
+#15 0.537 > vite build --config vite.config.ts
+#15 0.537 
+#15 0.672 ▲ [WARNING] Cannot find base config file "../../tsconfig.base.json" [tsconfig.json]
+#15 0.672 
+#15 0.672     tsconfig.json:2:13:
+#15 0.672       2 │   "extends": "../../tsconfig.base.json",
+#15 0.672         ╵              ~~~~~~~~~~~~~~~~~~~~~~~~~~
+#15 0.672 
+#15 0.792 vite v7.3.1 building client environment for production...
+#15 0.851 ✓ 0 modules transformed.
+#15 0.854 ✗ Build failed in 37ms
+#15 0.854 error during build:
+#15 0.854 [vite:build-html] failed to resolve "extends":"../../tsconfig.base.json" in /app/artifacts/criskros/tsconfig.json
+#15 0.854 file: /app/artifacts/criskros/index.html
+#15 0.854     at resolveExtends (file:///app/node_modules/.pnpm/vite@7.3.1_@types+node@25.3.5_jiti@2.6.1_lightningcss@1.31.1_tsx@4.21.0_yaml@2.8.2/node_modules/vite/dist/node/chunks/config.js:5809:8)
+#15 0.854     at parseExtends (file:///app/node_modules/.pnpm/vite@7.3.1_@types+node@25.3.5_jiti@2.6.1_lightningcss@1.31.1_tsx@4.21.0_yaml@2.8.2/node_modules/vite/dist/node/chunks/config.js:5775:71)
+#15 0.854     at parse$13 (file:///app/node_modules/.pnpm/vite@7.3.1_@types+node@25.3.5_jiti@2.6.1_lightningcss@1.31.1_tsx@4.21.0_yaml@2.8.2/node_modules/vite/dist/node/chunks/config.js:5677:23)
+#15 0.854     at async loadTsconfigJsonForFile (file:///app/node_modules/.pnpm/vite@7.3.1_@types+node@25.3.5_jiti@2.6.1_lightningcss@1.31.1_tsx@4.21.0_yaml@2.8.2/node_modules/vite/dist/node/chunks/config.js:6286:37)
+#15 0.854     at async transformWithEsbuild (file:///app/node_modules/.pnpm/vite@7.3.1_@types+node@25.3.5_jiti@2.6.1_lightningcss@1.31.1_tsx@4.21.0_yaml@2.8.2/node_modules/vite/dist/node/chunks/config.js:6086:55)
+#15 0.854     at async Object.transform (file:///app/node_modules/.pnpm/vite@7.3.1_@types+node@25.3.5_jiti@2.6.1_lightningcss@1.31.1_tsx@4.21.0_yaml@2.8.2/node_modules/vite/dist/node/chunks/config.js:6172:20)
+#15 0.854     at async transform (file:///app/node_modules/.pnpm/rollup@4.59.0/node_modules/rollup/dist/es/shared/node-entry.js:21269:16)
+#15 0.854     at async ModuleLoader.addModuleSource (file:///app/node_modules/.pnpm/rollup@4.59.0/node_modules/rollup/dist/es/shared/node-entry.js:21497:36)
+#15 0.872 /app/artifacts/criskros:
+#15 0.872  ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  @workspace/criskros@0.0.0 build: `vite build --config vite.config.ts`
+#15 0.872 Exit status 1
+#15 ERROR: process "/bin/sh -c BASE_PATH=/ PORT=3000 pnpm --filter @workspace/criskros run build" did not complete successfully: exit code: 1
+------
+ > [builder 8/8] RUN BASE_PATH=/ PORT=3000 pnpm --filter @workspace/criskros run build:
+0.854     at parseExtends (file:///app/node_modules/.pnpm/vite@7.3.1_@types+node@25.3.5_jiti@2.6.1_lightningcss@1.31.1_tsx@4.21.0_yaml@2.8.2/node_modules/vite/dist/node/chunks/config.js:5775:71)
+0.854     at parse$13 (file:///app/node_modules/.pnpm/vite@7.3.1_@types+node@25.3.5_jiti@2.6.1_lightningcss@1.31.1_tsx@4.21.0_yaml@2.8.2/node_modules/vite/dist/node/chunks/config.js:5677:23)
+0.854     at async loadTsconfigJsonForFile (file:///app/node_modules/.pnpm/vite@7.3.1_@types+node@25.3.5_jiti@2.6.1_lightningcss@1.31.1_tsx@4.21.0_yaml@2.8.2/node_modules/vite/dist/node/chunks/config.js:6286:37)
+0.854     at async transformWithEsbuild (file:///app/node_modules/.pnpm/vite@7.3.1_@types+node@25.3.5_jiti@2.6.1_lightningcss@1.31.1_tsx@4.21.0_yaml@2.8.2/node_modules/vite/dist/node/chunks/config.js:6086:55)
+0.854     at async Object.transform (file:///app/node_modules/.pnpm/vite@7.3.1_@types+node@25.3.5_jiti@2.6.1_lightningcss@1.31.1_tsx@4.21.0_yaml@2.8.2/node_modules/vite/dist/node/chunks/config.js:6172:20)
+0.854     at async transform (file:///app/node_modules/.pnpm/rollup@4.59.0/node_modules/rollup/dist/es/shared/node-entry.js:21269:16)
+0.854     at async ModuleLoader.addModuleSource (file:///app/node_modules/.pnpm/rollup@4.59.0/node_modules/rollup/dist/es/shared/node-entry.js:21497:36)
+0.872 /app/artifacts/criskros:
+0.872  ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  @workspace/criskros@0.0.0 build: `vite build --config vite.config.ts`
+0.872 Exit status 1
+------
+Dockerfile.frontend:16
+
+--------------------
+
+  14 |     
+
+  15 |     # Build the frontend (BASE_PATH=/ for production root deployment)
+
+  16 | >>> RUN BASE_PATH=/ PORT=3000 pnpm --filter @workspace/criskros run build
+
+  17 |     
+
+  18 |     # ---- Serve stage ----
+
+--------------------
+
+failed to solve: process "/bin/sh -c BASE_PATH=/ PORT=3000 pnpm --filter @workspace/criskros run build" did not complete successfully: exit code: 1
