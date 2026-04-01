@@ -1,0 +1,28 @@
+cd /opt/criskros
+
+# API crash details
+docker compose -f deploy/docker-compose.yml --env-file deploy/.env logs api --tail=20
+
+# Traefik routing/certificate details  
+docker compose -f /opt/proxy/docker-compose.yml logs traefik --tail=30
+api-1  |   ^
+api-1  | 
+api-1  | Error: Cannot find module 'http-proxy-middleware'
+api-1  | Require stack:
+api-1  | - /app/dist/index.cjs
+api-1  |     at Function._resolveFilename (node:internal/modules/cjs/loader:1383:15)
+api-1  |     at defaultResolveImpl (node:internal/modules/cjs/loader:1025:19)
+api-1  |     at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1030:22)
+api-1  |     at Function._load (node:internal/modules/cjs/loader:1192:37)
+api-1  |     at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+api-1  |     at wrapModuleLoad (node:internal/modules/cjs/loader:237:24)
+api-1  |     at Module.require (node:internal/modules/cjs/loader:1463:12)
+api-1  |     at require (node:internal/modules/helpers:147:16)
+api-1  |     at Object.<anonymous> (/app/dist/index.cjs:59:87054)
+api-1  |     at Module._compile (node:internal/modules/cjs/loader:1705:14) {
+api-1  |   code: 'MODULE_NOT_FOUND',
+api-1  |   requireStack: [ '/app/dist/index.cjs' ]
+api-1  | }
+api-1  | 
+api-1  | Node.js v22.22.2
+traefik-1  | 2026-03-31T18:23:23Z ERR Unable to obtain ACME certificate for domains error="unable to generate a certificate for the domains [www.criskros.com www.www.criskros.com]: error: one or more domains had a problem:\n[www.www.criskros.com] invalid authorization: acme: error: 400 :: urn:ietf:params:acme:error:dns :: DNS problem: NXDOMAIN looking up A for www.www.criskros.com - check that a DNS record exists for this domain; DNS problem: NXDOMAIN looking up AAAA for www.www.criskros.com - check that a DNS record exists for this domain\n" ACME CA=https://acme-v02.api.letsencrypt.org/directory acmeCA=https://acme-v02.api.letsencrypt.org/directory domains=["www.criskros.com","www.www.criskros.com"] providerName=letsencrypt.acme routerName=criskros@docker rule="Host(`www.criskros.com`) || Host(`www.www.criskros.com`)"
