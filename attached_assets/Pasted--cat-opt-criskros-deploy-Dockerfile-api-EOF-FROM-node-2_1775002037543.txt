@@ -1,0 +1,68 @@
+ cat > /opt/criskros/deploy/Dockerfile.api << 'EOF'
+FROM node:22-slim AS builder
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
+
+WORKDIR /app
+
+COPY pnpm-workspace.yaml package.json pnpm-lock.yaml .npmrc tsconfig.base.json ./
+COPY lib/ ./lib/
+COPY artifacts/api-server/ ./artifacts/api-server/
+
+RUN pnpm install --frozen-lockfile
+
+RUN pnpm --filter @workspace/api-server run build
+
+FROM node:22-slim
+
+WORKDIR /app
+
+COPY --from=builder /app/artifacts/api-server/dist ./dist
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/artifacts/api-server/package.json ./package.json
+
+ENV PORT=8080
+ENV NODE_ENV=production
+EXPOSE 8080
+
+CMD ["node", "dist/index.cjs"]
+EOF
+
+cd /opt/criskros
+docker compose -f deploy/docker-compose.yml --env-file deploy/.env up -d --build --no-deps api
+[+] Building 11.9s (19/19) FINISHED                                                                                                                                                         
+ => [internal] load local bake definitions                                                                                                                                             0.0s
+ => => reading from stdin 479B                                                                                                                                                         0.0s
+ => [internal] load build definition from Dockerfile.api                                                                                                                               0.0s
+ => => transferring dockerfile: 696B                                                                                                                                                   0.0s
+ => [internal] load metadata for docker.io/library/node:22-slim                                                                                                                        1.5s
+ => [internal] load .dockerignore                                                                                                                                                      0.0s
+ => => transferring context: 2B                                                                                                                                                        0.0s
+ => CACHED [builder 1/8] FROM docker.io/library/node:22-slim@sha256:80fdb3f57c815e1b638d221f30a826823467c4a56c8f6a8d7aa091cd9b1675ea                                                   0.0s
+ => => resolve docker.io/library/node:22-slim@sha256:80fdb3f57c815e1b638d221f30a826823467c4a56c8f6a8d7aa091cd9b1675ea                                                                  0.0s
+ => [internal] load build context                                                                                                                                                      0.0s
+ => => transferring context: 3.38kB                                                                                                                                                    0.0s
+ => [stage-1 2/5] WORKDIR /app                                                                                                                                                         0.0s
+ => CACHED [builder 2/8] RUN corepack enable                                                                                                                                           0.0s
+ => CACHED [builder 3/8] WORKDIR /app                                                                                                                                                  0.0s
+ => CACHED [builder 4/8] COPY pnpm-workspace.yaml package.json pnpm-lock.yaml .npmrc tsconfig.base.json ./                                                                             0.0s
+ => CACHED [builder 5/8] COPY lib/ ./lib/                                                                                                                                              0.0s
+ => [builder 6/8] COPY artifacts/api-server/ ./artifacts/api-server/                                                                                                                   0.0s
+ => [builder 7/8] RUN pnpm install --frozen-lockfile                                                                                                                                   4.5s
+ => [builder 8/8] RUN pnpm --filter @workspace/api-server run build                                                                                                                    0.9s 
+ => [stage-1 3/5] COPY --from=builder /app/artifacts/api-server/dist ./dist                                                                                                            0.1s 
+ => [stage-1 4/5] COPY --from=builder /app/node_modules ./node_modules                                                                                                                 0.6s 
+ => [stage-1 5/5] COPY --from=builder /app/artifacts/api-server/package.json ./package.json                                                                                            0.1s 
+ => exporting to image                                                                                                                                                                 3.5s 
+ => => exporting layers                                                                                                                                                                2.5s 
+ => => exporting manifest sha256:0aa365dd69a804d344889b0de70bb94e2704fb7a373e73d1714e68e8155f369c                                                                                      0.0s
+ => => exporting config sha256:b20bc3c0df025682c4c3ea59e166fd77c5e9fa156eb1e287c175b8e36adce5b8                                                                                        0.0s
+ => => exporting attestation manifest sha256:e51a65c89542317837139c01b37c4e5241025de90b7867db93af61f250d07f39                                                                          0.0s
+ => => exporting manifest list sha256:27f128c609f561537a977438cb268038c95cb1d551bda716f2eb8428ca1cdf70                                                                                 0.0s
+ => => naming to docker.io/library/criskros-api:latest                                                                                                                                 0.0s
+ => => unpacking to docker.io/library/criskros-api:latest                                                                                                                              1.0s
+ => resolving provenance for metadata file                                                                                                                                             0.0s
+[+] up 2/2
+ ✔ Image criskros-api       Built                                                                                                                                                      11.9s
+ ✔ Container criskros-api-1 Started 
