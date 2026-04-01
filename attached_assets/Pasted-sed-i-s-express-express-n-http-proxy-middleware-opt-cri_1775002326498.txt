@@ -1,0 +1,39 @@
+sed -i 's/"express",/"express",\n  "http-proxy-middleware",/' /opt/criskros/artifacts/api-server/build.ts
+
+cd /opt/criskros
+docker compose -f deploy/docker-compose.yml --env-file deploy/.env up -d --build --no-deps api
+[+] Building 11.8s (19/19) FINISHED                                                                                                                                                         
+ => [internal] load local bake definitions                                                                                                                                             0.0s
+ => => reading from stdin 479B                                                                                                                                                         0.0s
+ => [internal] load build definition from Dockerfile.api                                                                                                                               0.0s
+ => => transferring dockerfile: 696B                                                                                                                                                   0.0s
+ => [internal] load metadata for docker.io/library/node:22-slim                                                                                                                        1.3s
+ => [internal] load .dockerignore                                                                                                                                                      0.0s
+ => => transferring context: 2B                                                                                                                                                        0.0s
+ => [builder 1/8] FROM docker.io/library/node:22-slim@sha256:80fdb3f57c815e1b638d221f30a826823467c4a56c8f6a8d7aa091cd9b1675ea                                                          0.0s
+ => => resolve docker.io/library/node:22-slim@sha256:80fdb3f57c815e1b638d221f30a826823467c4a56c8f6a8d7aa091cd9b1675ea                                                                  0.0s
+ => [internal] load build context                                                                                                                                                      0.0s
+ => => transferring context: 4.49kB                                                                                                                                                    0.0s
+ => CACHED [builder 2/8] RUN corepack enable                                                                                                                                           0.0s
+ => CACHED [builder 3/8] WORKDIR /app                                                                                                                                                  0.0s
+ => CACHED [builder 4/8] COPY pnpm-workspace.yaml package.json pnpm-lock.yaml .npmrc tsconfig.base.json ./                                                                             0.0s
+ => CACHED [builder 5/8] COPY lib/ ./lib/                                                                                                                                              0.0s
+ => [builder 6/8] COPY artifacts/api-server/ ./artifacts/api-server/                                                                                                                   0.0s
+ => [builder 7/8] RUN pnpm install --frozen-lockfile                                                                                                                                   4.7s
+ => [builder 8/8] RUN pnpm --filter @workspace/api-server run build                                                                                                                    0.8s 
+ => CACHED [stage-1 2/5] WORKDIR /app                                                                                                                                                  0.0s 
+ => [stage-1 3/5] COPY --from=builder /app/artifacts/api-server/dist ./dist                                                                                                            0.1s 
+ => [stage-1 4/5] COPY --from=builder /app/node_modules ./node_modules                                                                                                                 0.6s 
+ => [stage-1 5/5] COPY --from=builder /app/artifacts/api-server/package.json ./package.json                                                                                            0.1s 
+ => exporting to image                                                                                                                                                                 3.5s 
+ => => exporting layers                                                                                                                                                                2.5s
+ => => exporting manifest sha256:44c9661d2ddf1aa90c2909bfaa5899bd144e9bc6cf493663d0c6c1c89803ea57                                                                                      0.0s
+ => => exporting config sha256:083621bfbfb2e2b5009e2257e13d27b19b8a825562a273e97ac099baa2cec104                                                                                        0.0s
+ => => exporting attestation manifest sha256:58e81daf6e81a70ab907a4ec67b75c56508098e9c31af258afff514fe5db4d8b                                                                          0.0s
+ => => exporting manifest list sha256:d2925df338b8cfc256f2a12b65d726bb35c81ff8043c16a106402af1003eabe2                                                                                 0.0s
+ => => naming to docker.io/library/criskros-api:latest                                                                                                                                 0.0s
+ => => unpacking to docker.io/library/criskros-api:latest                                                                                                                              1.0s
+ => resolving provenance for metadata file                                                                                                                                             0.0s
+[+] up 2/2
+ ✔ Image criskros-api       Built                                                                                                                                                      11.8s
+ ✔ Container criskros-api-1 Started   
