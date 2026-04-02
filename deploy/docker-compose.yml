@@ -34,7 +34,7 @@ services:
       ADMIN_JWT_SECRET: ${STRAPI_ADMIN_JWT_SECRET}
       TRANSFER_TOKEN_SALT: ${STRAPI_TRANSFER_TOKEN_SALT}
       JWT_SECRET: ${STRAPI_JWT_SECRET}
-      STRAPI_ADMIN_BACKEND_URL: https://${DOMAIN}/api/strapi-admin
+      URL: https://${CMS_DOMAIN}
     depends_on:
       postgres:
         condition: service_healthy
@@ -42,6 +42,14 @@ services:
       - strapi_uploads:/app/public/uploads
     networks:
       - internal
+      - proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}-cms.rule=Host(`${CMS_DOMAIN}`)"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}-cms.entrypoints=websecure"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}-cms.tls.certresolver=letsencrypt"
+      - "traefik.http.services.${COMPOSE_PROJECT_NAME}-cms.loadbalancer.server.port=1337"
 
   # ── API Server ───────────────────────────────────────────────────────
   api:
