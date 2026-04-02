@@ -1,0 +1,21 @@
+docker exec criskros-frontend-1 ls -la /etc/nginx/.htpasswd 2>&1
+ls: /etc/nginx/.htpasswd: No such file or directory
+root@srv1542614:/opt/criskros# # Check if htpasswd file was created
+docker exec criskros-frontend-1 ls -la /etc/nginx/.htpasswd 2>&1
+
+# Check if nginx.conf has auth_basic
+docker exec criskros-frontend-1 grep "auth_basic" /etc/nginx/conf.d/default.conf 2>&1
+
+# Check container startup logs
+docker logs criskros-frontend-1 --tail=10
+ls: /etc/nginx/.htpasswd: No such file or directory
+172.18.0.2 - - [02/Apr/2026:06:01:50 +0000] "GET /api/cms/api/news-items?sort=date:desc&publicationState=live HTTP/1.1" 200 724 "https://www.criskros.com/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36" "103.40.73.156"
+172.18.0.2 - - [02/Apr/2026:06:01:50 +0000] "GET /api/cms/api/team-members?sort=order:asc&publicationState=live HTTP/1.1" 200 933 "https://www.criskros.com/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36" "103.40.73.156"
+172.18.0.2 - preview [02/Apr/2026:06:03:37 +0000] "GET / HTTP/1.1" 304 0 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36" "103.40.73.156"
+172.18.0.2 - preview [02/Apr/2026:06:03:37 +0000] "GET /api/cms/api/hero-banner?publicationState=live HTTP/1.1" 200 571 "https://www.criskros.com/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36" "103.40.73.156"
+172.18.0.2 - preview [02/Apr/2026:06:03:37 +0000] "GET /api/cms/api/concept-section?publicationState=live HTTP/1.1" 200 522 "https://www.criskros.com/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36" "103.40.73.156"
+172.18.0.2 - preview [02/Apr/2026:06:03:38 +0000] "GET /api/cms/api/concept-items?sort=order:asc&publicationState=live HTTP/1.1" 200 562 "https://www.criskros.com/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36" "103.40.73.156"
+172.18.0.2 - preview [02/Apr/2026:06:03:38 +0000] "GET /api/cms/api/fee-section?publicationState=live HTTP/1.1" 200 835 "https://www.criskros.com/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36" "103.40.73.156"
+172.18.0.2 - preview [02/Apr/2026:06:03:38 +0000] "GET /api/cms/api/testimonials?publicationState=live HTTP/1.1" 200 710 "https://www.criskros.com/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36" "103.40.73.156"
+172.18.0.2 - preview [02/Apr/2026:06:03:38 +0000] "GET /api/cms/api/team-members?sort=order:asc&publicationState=live HTTP/1.1" 200 933 "https://www.criskros.com/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36" "103.40.73.156"
+172.18.0.2 - preview [02/Apr/2026:06:03:38 +0000] "GET /api/cms/api/news-items?sort=date:desc&publicationState=live HTTP/1.1" 200 724 "https://www.criskros.com/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36" "103.40.73.156"
