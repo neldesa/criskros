@@ -70,6 +70,10 @@ services:
       context: ..
       dockerfile: deploy/Dockerfile.frontend
     restart: always
+    volumes:
+      # Mount config files from the host so changes survive rebuilds and restarts
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./htpasswd:/etc/nginx/.htpasswd:ro
     networks:
       - internal
       - proxy        # connects to the shared Traefik proxy network
