@@ -18,6 +18,8 @@ RUN BASE_PATH=/ PORT=3000 pnpm --filter @workspace/criskros run build
 # ---- Serve stage ----
 FROM nginx:alpine
 
+RUN apk add --no-cache apache2-utils
+
 # Preview credentials — set via environment variables at runtime
 ENV PREVIEW_USER=preview
 ENV PREVIEW_PASSWORD=criskros2026
