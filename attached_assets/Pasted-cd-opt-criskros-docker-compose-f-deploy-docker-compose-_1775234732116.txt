@@ -1,0 +1,61 @@
+cd /opt/criskros
+docker compose -f deploy/docker-compose.yml --env-file deploy/.env build strapi 2>&1 | tail -60
+#11 2.424 - Compiling TS
+#11 7.970 src/api/gallery-item/controllers/gallery-item.ts:2:47 - error TS2345: Argument of type '"api::gallery-item.gallery-item"' is not assignable to parameter of type 'ContentType'.
+#11 7.970 
+#11 7.970 2 export default factories.createCoreController('api::gallery-item.gallery-item');
+#11 7.970                                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#11 7.970 src/api/gallery-item/routes/gallery-item.ts:2:43 - error TS2345: Argument of type '"api::gallery-item.gallery-item"' is not assignable to parameter of type 'ContentType'.
+#11 7.970 
+#11 7.970 2 export default factories.createCoreRouter('api::gallery-item.gallery-item');
+#11 7.970                                             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#11 7.970 src/api/gallery-item/services/gallery-item.ts:2:44 - error TS2345: Argument of type '"api::gallery-item.gallery-item"' is not assignable to parameter of type 'ContentType'.
+#11 7.970 
+#11 7.970 2 export default factories.createCoreService('api::gallery-item.gallery-item');
+#11 7.970                                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#11 7.970 src/api/portal-announcement/controllers/portal-announcement.ts:2:47 - error TS2345: Argument of type '"api::portal-announcement.portal-announcement"' is not assignable to parameter of type 'ContentType'.
+#11 7.970 
+#11 7.970 2 export default factories.createCoreController('api::portal-announcement.portal-announcement');
+#11 7.970                                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#11 7.970 src/api/portal-announcement/routes/portal-announcement.ts:2:43 - error TS2345: Argument of type '"api::portal-announcement.portal-announcement"' is not assignable to parameter of type 'ContentType'.
+#11 7.970 
+#11 7.970 2 export default factories.createCoreRouter('api::portal-announcement.portal-announcement');
+#11 7.970                                             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#11 7.970 src/api/portal-announcement/services/portal-announcement.ts:2:44 - error TS2345: Argument of type '"api::portal-announcement.portal-announcement"' is not assignable to parameter of type 'ContentType'.
+#11 7.970 
+#11 7.970 2 export default factories.createCoreService('api::portal-announcement.portal-announcement');
+#11 7.970                                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#11 7.970 
+#11 7.972 Found 6 error(s).
+#11 7.972 
+#11 ERROR: process "/bin/sh -c npm run build" did not complete successfully: exit code: 1
+------
+ > [6/6] RUN npm run build:
+7.970 
+7.970 2 export default factories.createCoreRouter('api::portal-announcement.portal-announcement');
+7.970                                             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+7.970 src/api/portal-announcement/services/portal-announcement.ts:2:44 - error TS2345: Argument of type '"api::portal-announcement.portal-announcement"' is not assignable to parameter of type 'ContentType'.
+7.970 
+7.970 2 export default factories.createCoreService('api::portal-announcement.portal-announcement');
+7.970                                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+7.970 
+7.972 Found 6 error(s).
+7.972 
+------
+Dockerfile.strapi:11
+
+--------------------
+
+   9 |     # Copy source and build
+
+  10 |     COPY strapi/ ./
+
+  11 | >>> RUN npm run build
+
+  12 |     
+
+  13 |     ENV HOST=0.0.0.0
+
+--------------------
+
+failed to solve: process "/bin/sh -c npm run build" did not complete successfully: exit code: 1
