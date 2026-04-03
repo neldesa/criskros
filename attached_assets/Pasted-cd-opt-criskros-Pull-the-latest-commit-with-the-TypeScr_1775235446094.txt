@@ -1,0 +1,139 @@
+cd /opt/criskros
+
+# Pull the latest commit (with the TypeScript fix)
+git pull https://github.com/neldesa/criskros.git master
+
+# Confirm the fix is in the files
+grep -l "ts-nocheck" strapi/src/api/gallery-item/controllers/gallery-item.ts
+
+# Clear Docker build cache so it re-copies the files
+docker builder prune -af
+
+# Rebuild Strapi
+docker compose -f deploy/docker-compose.yml --env-file deploy/.env build strapi
+docker compose -f deploy/docker-compose.yml --env-file deploy/.env up -d --no-deps strapi
+From https://github.com/neldesa/criskros
+ * branch            master     -> FETCH_HEAD
+Already up to date.
+ID                                              RECLAIMABLE     SIZE            LAST ACCESSED
+yyxjn1i89kvyevd1t4yiks62l*                      true            3.478MB         9 minutes ago
+6eq1h2viav75z6x98nq5u9arq*                      true    5.456MB         9 minutes ago
+y4xervrsw9z53cmbjp2nkrrsz*                      true    8.192kB         9 minutes ago
+dmo3c6i0x423dtq4rfewnw6r6*                      true    4.096kB         4 minutes ago
+vfsqzyzh9brcjdkznxocfv3tu*                      true    1.47MB          10 minutes ago
+8jy8nhffim9codxds5j3jp5qo                       true    29.52kB         9 minutes ago
+1swgj3u6g9x7zg6qs4ggw17hs                       true    2.028MB         4 minutes ago
+tvfl17rpzrhhzldbd1lmdv9xh*                      true    2.028MB         4 minutes ago
+1fvn7tkrjc3uj7ccjpyoveder*                      true    8.192kB         4 minutes ago
+qahs490zw9n1v0tox8r6yv92p*                      true    8.192kB         8 minutes ago
+upxodujiuvqr4okeetjg7h1z7                       true    6.075MB         9 minutes ago
+udo6b3p4n61nyvj31j0hfecyy                       true    182MB           10 minutes ago
+k5fdrz18n2gbv3g0l3g25953j                       true    491.3MB         9 minutes ago
+e33ufl8gz6ij07vq1cul0bv4z                       true    1.479GB         8 minutes ago
+oz3x1mnwa6w9sbweh9vl22eio                       true    12.79kB         10 minutes ago
+xhdwjzgq18s5kphskagdy2ggf*                      true    466.9kB         9 minutes ago
+gjo60u4lxe24jj911yhzapm48                       true    503.8kB         8 minutes ago
+3v08cvkoaemz6qmkpq4gkhfud                       true    3.084MB         9 minutes ago
+n8ydnlrufls5172jy01lc86z9                       true    172.7MB         10 minutes ago
+waifi5vo9c4192u9ibkk6nm14                       true    86.02kB         10 minutes ago
+n6aht0ecx16q092f9wxtu1b76                       true    12.63kB         9 minutes ago
+g6pav96hcp792lf50rghqf1ac                       true    8.192kB         8 minutes ago
+wx5xr6vqxv6s5mnf1549np1l3                       true    155.6kB         10 minutes ago
+zztql1hctcgymqs93st739w28                       true    8.531kB         10 minutes ago
+mkjxvxc089kor2seb27l8ka5v                       true    1.863MB         10 minutes ago
+co26xcsd4lcplz0koc5izs9sa                       true    8.285kB         10 minutes ago
+g8tvfa6ex3f1nzg5yeiwdwjc4                       true    447B            8 minutes ago
+zdqzvdw94s6kzpi5g1q94vxhh                       true    245.8kB         10 minutes ago
+r44uxc5valkagdux34zx3ru0o                       true    1.157MB         10 minutes ago
+yod8gdy3we66q7ilcjp04iqis                       true    1.262MB         10 minutes ago
+646z27g0lds024a1le16maqhf                       true    8.192kB         10 minutes ago
+k39loppxks7vs9hg01mynxikf                       true    20.25MB         10 minutes ago
+9mnz234lzjmybd3alob1lwytr                       true    180.2kB         10 minutes ago
+u6pxygfcj0b4zyyx0frhvh412                       true    51.96MB         10 minutes ago
+st7mvx57wdwz6g2gqfso7ck9j                       true    1.397kB         10 minutes ago
+lcvhbje6d7ymjj5qrwa49um3d                       true    1.207kB         10 minutes ago
+bwdm51ay2hklo72eeagismgp0                       true    447B            10 minutes ago
+vbdhgu9m7fihu0bijeh48alyt                       true    402B            10 minutes ago
+as4vd9sk6dm2urg96jti6wuby                       true    1.713MB         10 minutes ago
+mceo1axq7eh9qlo9yhwgpz9kk                       true    49.84MB         10 minutes ago
+jxdgoinqfjmrwcjsxxskls5gw                       true    953B            10 minutes ago
+6k5x5ivu08d1ssjh3m86pqh0e                       true    3.313kB         10 minutes ago
+ukzqzorioatuf0tv5clru271r                       true    626B            10 minutes ago
+1juwbwheaolnjkr95s4s3kejb                       true    1.87MB          10 minutes ago
+4ma6egmxt6ss3dsrm4a4a45wy                       true    28.24MB         10 minutes ago
+rphz1zfj9x8jdwqf7mojzie2c                       true    3.862MB         10 minutes ago
+Total:  2.512GB
+[+] Building 100.8s (11/11) FINISHED                                                                                                                                                        
+ => [internal] load local bake definitions                                                                                                                                             0.0s
+ => => reading from stdin 494B                                                                                                                                                         0.0s
+ => [internal] load build definition from Dockerfile.strapi                                                                                                                            0.7s
+ => => transferring dockerfile: 324B                                                                                                                                                   0.0s
+ => [internal] load metadata for docker.io/library/node:22-alpine                                                                                                                      5.1s
+ => [internal] load .dockerignore                                                                                                                                                      0.3s
+ => => transferring context: 2B                                                                                                                                                        0.0s
+ => [1/6] FROM docker.io/library/node:22-alpine@sha256:4d64b49e6c891c8fc821007cb1cdc6c0db7773110ac2c34bf2e6960adef62ed3                                                                2.5s
+ => => resolve docker.io/library/node:22-alpine@sha256:4d64b49e6c891c8fc821007cb1cdc6c0db7773110ac2c34bf2e6960adef62ed3                                                                0.3s
+ => [internal] load build context                                                                                                                                                      1.7s
+ => => transferring context: 1.54MB                                                                                                                                                    0.0s
+ => [2/6] WORKDIR /app                                                                                                                                                                 0.8s
+ => [3/6] COPY strapi/package.json strapi/package-lock.json ./                                                                                                                         1.2s
+ => [4/6] RUN npm ci                                                                                                                                                                  77.2s
+ => [5/6] COPY strapi/ ./                                                                                                                                                              2.8s 
+ => ERROR [6/6] RUN npm run build                                                                                                                                                      8.0s 
+------                                                                                                                                                                                      
+ > [6/6] RUN npm run build:                                                                                                                                                                 
+2.422                                                                                                                                                                                       
+2.422 > strapi@0.1.0 build                                                                                                                                                                  
+2.422 > strapi build                                                                                                                                                                        
+2.422                                                                                                                                                                                       
+3.813 - Compiling TS
+6.973 src/api/gallery-item/controllers/gallery-item.ts:2:47 - error TS2345: Argument of type '"api::gallery-item.gallery-item"' is not assignable to parameter of type 'ContentType'.
+6.973 
+6.973 2 export default factories.createCoreController('api::gallery-item.gallery-item');
+6.973                                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+6.973 src/api/gallery-item/routes/gallery-item.ts:2:43 - error TS2345: Argument of type '"api::gallery-item.gallery-item"' is not assignable to parameter of type 'ContentType'.
+6.973 
+6.973 2 export default factories.createCoreRouter('api::gallery-item.gallery-item');
+6.973                                             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+6.973 src/api/gallery-item/services/gallery-item.ts:2:44 - error TS2345: Argument of type '"api::gallery-item.gallery-item"' is not assignable to parameter of type 'ContentType'.
+6.973 
+6.973 2 export default factories.createCoreService('api::gallery-item.gallery-item');
+6.973                                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+6.973 src/api/portal-announcement/controllers/portal-announcement.ts:2:47 - error TS2345: Argument of type '"api::portal-announcement.portal-announcement"' is not assignable to parameter of type 'ContentType'.
+6.973 
+6.973 2 export default factories.createCoreController('api::portal-announcement.portal-announcement');
+6.973                                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+6.973 src/api/portal-announcement/routes/portal-announcement.ts:2:43 - error TS2345: Argument of type '"api::portal-announcement.portal-announcement"' is not assignable to parameter of type 'ContentType'.
+6.973 
+6.973 2 export default factories.createCoreRouter('api::portal-announcement.portal-announcement');
+6.973                                             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+6.973 src/api/portal-announcement/services/portal-announcement.ts:2:44 - error TS2345: Argument of type '"api::portal-announcement.portal-announcement"' is not assignable to parameter of type 'ContentType'.
+6.973 
+6.973 2 export default factories.createCoreService('api::portal-announcement.portal-announcement');
+6.973                                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+6.973 
+6.977 Found 6 error(s).
+6.977 
+------
+[+] build 0/1
+ ⠙ Image criskros-strapi Building                                                                                                                                                     101.1s
+Dockerfile.strapi:11
+
+--------------------
+
+   9 |     # Copy source and build
+
+  10 |     COPY strapi/ ./
+
+  11 | >>> RUN npm run build
+
+  12 |     
+
+  13 |     ENV HOST=0.0.0.0
+
+--------------------
+
+failed to solve: process "/bin/sh -c npm run build" did not complete successfully: exit code: 1
+
+[+] up 1/1
+ ✔ Container criskros-strapi-1 Running 

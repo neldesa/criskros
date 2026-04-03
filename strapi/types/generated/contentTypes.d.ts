@@ -430,6 +430,73 @@ export interface AdminUser extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiGalleryItemGalleryItem extends Struct.CollectionTypeSchema {
+  collectionName: 'gallery_items';
+  info: {
+    displayName: 'Gallery Item';
+    pluralName: 'gallery-items';
+    singularName: 'gallery-item';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    caption: Schema.Attribute.Text;
+    category: Schema.Attribute.Enumeration<
+      ['event', 'training', 'team', 'ceremony', 'other']
+    >;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    date: Schema.Attribute.Date;
+    imageUrl: Schema.Attribute.String & Schema.Attribute.Required;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::gallery-item.gallery-item'
+    > &
+      Schema.Attribute.Private;
+    portalOnly: Schema.Attribute.Boolean;
+    publishedAt: Schema.Attribute.DateTime;
+    title: Schema.Attribute.String & Schema.Attribute.Required;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiPortalAnnouncementPortalAnnouncement extends Struct.CollectionTypeSchema {
+  collectionName: 'portal_announcements';
+  info: {
+    displayName: 'Portal Announcement';
+    pluralName: 'portal-announcements';
+    singularName: 'portal-announcement';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    content: Schema.Attribute.RichText & Schema.Attribute.Required;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    date: Schema.Attribute.Date & Schema.Attribute.Required;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::portal-announcement.portal-announcement'
+    > &
+      Schema.Attribute.Private;
+    pinned: Schema.Attribute.Boolean;
+    priority: Schema.Attribute.Enumeration<['normal', 'important', 'urgent']>;
+    publishedAt: Schema.Attribute.DateTime;
+    title: Schema.Attribute.String & Schema.Attribute.Required;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiNewsItemNewsItem extends Struct.CollectionTypeSchema {
   collectionName: 'news_items';
   info: {
@@ -1041,7 +1108,9 @@ declare module '@strapi/strapi' {
       'admin::transfer-token': AdminTransferToken;
       'admin::transfer-token-permission': AdminTransferTokenPermission;
       'admin::user': AdminUser;
+      'api::gallery-item.gallery-item': ApiGalleryItemGalleryItem;
       'api::news-item.news-item': ApiNewsItemNewsItem;
+      'api::portal-announcement.portal-announcement': ApiPortalAnnouncementPortalAnnouncement;
       'api::team-member.team-member': ApiTeamMemberTeamMember;
       'api::testimonial.testimonial': ApiTestimonialTestimonial;
       'plugin::content-releases.release': PluginContentReleasesRelease;
