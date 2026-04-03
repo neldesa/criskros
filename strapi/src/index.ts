@@ -15,6 +15,8 @@ async function setPublicPermissions(strapi: Core.Strapi) {
     'api::concept-section.concept-section',
     'api::concept-item.concept-item',
     'api::fee-section.fee-section',
+    'api::gallery-item.gallery-item',
+    'api::portal-announcement.portal-announcement',
   ];
 
   const actions = ['find', 'findOne'];
