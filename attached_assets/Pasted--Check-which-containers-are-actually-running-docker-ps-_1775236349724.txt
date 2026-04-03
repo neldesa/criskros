@@ -1,0 +1,39 @@
+# Check which containers are actually running
+docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+
+# Check if the last build had any errors
+docker compose -f /opt/criskros/deploy/docker-compose.yml --env-file /opt/criskros/deploy/.env ps
+
+# Check frontend container logs
+docker logs criskros-frontend-1 --tail=20
+NAMES                 STATUS                          PORTS
+criskros-frontend-1   Up 4 seconds                    80/tcp
+criskros-api-1        Restarting (1) 53 seconds ago   
+criskros-strapi-1     Up 2 minutes                    1337/tcp
+criskros-postgres-1   Up 35 minutes (healthy)         5432/tcp
+proxy-traefik-1       Up 12 hours                     0.0.0.0:80->80/tcp, [::]:80->80/tcp, 0.0.0.0:443->443/tcp, [::]:443->443/tcp
+NAME                  IMAGE                COMMAND                  SERVICE    CREATED          STATUS                          PORTS
+criskros-api-1        criskros-api         "docker-entrypoint.s…"   api        3 minutes ago    Restarting (1) 53 seconds ago   
+criskros-frontend-1   criskros-frontend    "/entrypoint.sh"         frontend   2 minutes ago    Up 4 seconds                    80/tcp
+criskros-postgres-1   postgres:16-alpine   "docker-entrypoint.s…"   postgres   35 minutes ago   Up 35 minutes (healthy)         5432/tcp
+criskros-strapi-1     criskros-strapi      "docker-entrypoint.s…"   strapi     3 minutes ago    Up 2 minutes                    1337/tcp
+nginx: [emerg] host not found in upstream "api" in /etc/nginx/conf.d/default.conf:20
+Password protection enabled for user: preview
+2026/04/03 17:09:44 [emerg] 1#1: host not found in upstream "api" in /etc/nginx/conf.d/default.conf:20
+nginx: [emerg] host not found in upstream "api" in /etc/nginx/conf.d/default.conf:20
+Password protection enabled for user: preview
+2026/04/03 17:09:52 [emerg] 1#1: host not found in upstream "api" in /etc/nginx/conf.d/default.conf:20
+nginx: [emerg] host not found in upstream "api" in /etc/nginx/conf.d/default.conf:20
+Password protection enabled for user: preview
+2026/04/03 17:10:01 [emerg] 1#1: host not found in upstream "api" in /etc/nginx/conf.d/default.conf:20
+nginx: [emerg] host not found in upstream "api" in /etc/nginx/conf.d/default.conf:20
+Password protection enabled for user: preview
+2026/04/03 17:10:13 [emerg] 1#1: host not found in upstream "api" in /etc/nginx/conf.d/default.conf:20
+nginx: [emerg] host not found in upstream "api" in /etc/nginx/conf.d/default.conf:20
+Password protection enabled for user: preview
+2026/04/03 17:10:31 [emerg] 1#1: host not found in upstream "api" in /etc/nginx/conf.d/default.conf:20
+nginx: [emerg] host not found in upstream "api" in /etc/nginx/conf.d/default.conf:20
+Password protection enabled for user: preview
+2026/04/03 17:11:01 [emerg] 1#1: host not found in upstream "api" in /etc/nginx/conf.d/default.conf:20
+nginx: [emerg] host not found in upstream "api" in /etc/nginx/conf.d/default.conf:20
+Password protection enabled for user: preview
