@@ -1,0 +1,58 @@
+ RUN npm run build:                                                                                                                                                                 
+1.116                                                                                                                                                                                       
+1.116 > strapi@0.1.0 build                                                                                                                                                                  
+1.116 > strapi build                                                                                                                                                                        
+1.116                                                                                                                                                                                       
+2.443 - Compiling TS
+5.448 src/api/gallery-item/controllers/gallery-item.ts:2:47 - error TS2345: Argument of type '"api::gallery-item.gallery-item"' is not assignable to parameter of type 'ContentType'.
+5.448 
+5.448 2 export default factories.createCoreController('api::gallery-item.gallery-item');
+5.448                                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+5.448 src/api/gallery-item/routes/gallery-item.ts:2:43 - error TS2345: Argument of type '"api::gallery-item.gallery-item"' is not assignable to parameter of type 'ContentType'.
+5.448 
+5.448 2 export default factories.createCoreRouter('api::gallery-item.gallery-item');
+5.448                                             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+5.448 src/api/gallery-item/services/gallery-item.ts:2:44 - error TS2345: Argument of type '"api::gallery-item.gallery-item"' is not assignable to parameter of type 'ContentType'.
+5.448 
+5.448 2 export default factories.createCoreService('api::gallery-item.gallery-item');
+5.448                                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+5.448 src/api/portal-announcement/controllers/portal-announcement.ts:2:47 - error TS2345: Argument of type '"api::portal-announcement.portal-announcement"' is not assignable to parameter of type 'ContentType'.
+5.448 
+5.448 2 export default factories.createCoreController('api::portal-announcement.portal-announcement');
+5.448                                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+5.448 src/api/portal-announcement/routes/portal-announcement.ts:2:43 - error TS2345: Argument of type '"api::portal-announcement.portal-announcement"' is not assignable to parameter of type 'ContentType'.
+5.448 
+5.448 2 export default factories.createCoreRouter('api::portal-announcement.portal-announcement');
+5.448                                             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+5.448 src/api/portal-announcement/services/portal-announcement.ts:2:44 - error TS2345: Argument of type '"api::portal-announcement.portal-announcement"' is not assignable to parameter of type 'ContentType'.
+5.448 
+5.448 2 export default factories.createCoreService('api::portal-announcement.portal-announcement');
+5.448                                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+5.448 
+5.450 Found 6 error(s).
+5.450 
+------
+[+] build 0/1
+ ⠙ Image criskros-strapi Building                                                                                                                                                       9.7s
+Dockerfile.strapi:11
+
+--------------------
+
+   9 |     # Copy source and build
+
+  10 |     COPY strapi/ ./
+
+  11 | >>> RUN npm run build
+
+  12 |     
+
+  13 |     ENV HOST=0.0.0.0
+
+--------------------
+
+failed to solve: process "/bin/sh -c npm run build" did not complete successfully: exit code: 1
+
+[+] up 1/1
+ ✔ Container criskros-strapi-1 Running                                                                                                                                                  0.0s
+Successfully copied 2.05kB to criskros-frontend-1:/etc/nginx/.htpasswd
+2026/04/03 16:47:23 [notice] 34#34: signal process started
