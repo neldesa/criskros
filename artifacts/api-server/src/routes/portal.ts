@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { db, teamAccountsTable, registrationsTable } from "@workspace/db";
+import { db, teamAccountsTable, portalTeamsTable } from "@workspace/db";
 import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
@@ -14,6 +14,7 @@ export interface PortalTokenPayload {
   email: string;
   teamName: string;
   organization: string;
+  source?: string;
 }
 
 export function requirePortalAuth(req: Request, res: Response, next: NextFunction) {
@@ -38,17 +39,50 @@ router.post("/login", async (req, res) => {
       return res.status(400).json({ error: "Email and password are required" });
     }
 
-    const account = await db
+    const normalizedEmail = email.toLowerCase().trim();
+
+    // Try Strapi-managed portal_teams table first
+    const strapiAccount = await db
       .select()
-      .from(teamAccountsTable)
-      .where(eq(teamAccountsTable.email, email.toLowerCase().trim()))
+      .from(portalTeamsTable)
+      .where(eq(portalTeamsTable.email, normalizedEmail))
       .then(rows => rows[0]);
 
-    if (!account || !account.isActive) {
+    if (strapiAccount && strapiAccount.isActive && strapiAccount.password) {
+      const valid = await bcrypt.compare(password, strapiAccount.password);
+      if (valid) {
+        const payload: PortalTokenPayload = {
+          teamAccountId: strapiAccount.id,
+          email: strapiAccount.email,
+          teamName: strapiAccount.teamName || "",
+          organization: strapiAccount.organization || "",
+          source: "portal_teams",
+        };
+        const token = jwt.sign(payload, JWT_SECRET, { expiresIn: "7d" });
+        return res.json({
+          success: true,
+          token,
+          team: {
+            teamName: strapiAccount.teamName,
+            organization: strapiAccount.organization,
+            email: strapiAccount.email,
+          },
+        });
+      }
+    }
+
+    // Fallback: try legacy team_accounts table
+    const legacyAccount = await db
+      .select()
+      .from(teamAccountsTable)
+      .where(eq(teamAccountsTable.email, normalizedEmail))
+      .then(rows => rows[0]);
+
+    if (!legacyAccount || !legacyAccount.isActive) {
       return res.status(401).json({ error: "Invalid credentials" });
     }
 
-    const valid = await bcrypt.compare(password, account.passwordHash);
+    const valid = await bcrypt.compare(password, legacyAccount.passwordHash);
     if (!valid) {
       return res.status(401).json({ error: "Invalid credentials" });
     }
@@ -56,24 +90,24 @@ router.post("/login", async (req, res) => {
     await db
       .update(teamAccountsTable)
       .set({ lastLoginAt: new Date() })
-      .where(eq(teamAccountsTable.id, account.id));
+      .where(eq(teamAccountsTable.id, legacyAccount.id));
 
     const payload: PortalTokenPayload = {
-      teamAccountId: account.id,
-      email: account.email,
-      teamName: account.teamName,
-      organization: account.organization,
+      teamAccountId: legacyAccount.id,
+      email: legacyAccount.email,
+      teamName: legacyAccount.teamName,
+      organization: legacyAccount.organization,
+      source: "team_accounts",
     };
 
     const token = jwt.sign(payload, JWT_SECRET, { expiresIn: "7d" });
-
     return res.json({
       success: true,
       token,
       team: {
-        teamName: account.teamName,
-        organization: account.organization,
-        email: account.email,
+        teamName: legacyAccount.teamName,
+        organization: legacyAccount.organization,
+        email: legacyAccount.email,
       },
     });
   } catch (err) {
@@ -86,6 +120,28 @@ router.post("/login", async (req, res) => {
 router.get("/me", requirePortalAuth, async (req, res) => {
   try {
     const user = (req as any).portalUser as PortalTokenPayload;
+
+    if (user.source === "portal_teams") {
+      const account = await db
+        .select()
+        .from(portalTeamsTable)
+        .where(eq(portalTeamsTable.id, user.teamAccountId))
+        .then(rows => rows[0]);
+
+      if (!account) return res.status(404).json({ error: "Account not found" });
+
+      return res.json({
+        success: true,
+        team: {
+          id: account.id,
+          teamName: account.teamName,
+          organization: account.organization,
+          email: account.email,
+        },
+      });
+    }
+
+    // Legacy team_accounts lookup
     const account = await db
       .select()
       .from(teamAccountsTable)
@@ -145,7 +201,7 @@ router.get("/announcements", requirePortalAuth, async (req, res) => {
   }
 });
 
-// POST /api/portal/create-account — admin only (protected by admin token)
+// POST /api/portal/create-account — admin only (legacy, kept for backward compatibility)
 router.post("/create-account", async (req, res) => {
   try {
     const adminToken = req.headers["x-admin-token"];

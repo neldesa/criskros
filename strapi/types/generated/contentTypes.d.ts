@@ -465,6 +465,37 @@ export interface ApiGalleryItemGalleryItem extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiPortalTeamPortalTeam extends Struct.CollectionTypeSchema {
+  collectionName: 'portal_teams';
+  info: {
+    displayName: 'Team Account';
+    pluralName: 'portal-teams';
+    singularName: 'portal-team';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    email: Schema.Attribute.Email & Schema.Attribute.Required & Schema.Attribute.Unique;
+    isActive: Schema.Attribute.Boolean;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::portal-team.portal-team'
+    > &
+      Schema.Attribute.Private;
+    organization: Schema.Attribute.String & Schema.Attribute.Required;
+    password: Schema.Attribute.Password & Schema.Attribute.Required & Schema.Attribute.Private;
+    teamName: Schema.Attribute.String & Schema.Attribute.Required;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiPortalAnnouncementPortalAnnouncement extends Struct.CollectionTypeSchema {
   collectionName: 'portal_announcements';
   info: {
@@ -1111,6 +1142,7 @@ declare module '@strapi/strapi' {
       'api::gallery-item.gallery-item': ApiGalleryItemGalleryItem;
       'api::news-item.news-item': ApiNewsItemNewsItem;
       'api::portal-announcement.portal-announcement': ApiPortalAnnouncementPortalAnnouncement;
+      'api::portal-team.portal-team': ApiPortalTeamPortalTeam;
       'api::team-member.team-member': ApiTeamMemberTeamMember;
       'api::testimonial.testimonial': ApiTestimonialTestimonial;
       'plugin::content-releases.release': PluginContentReleasesRelease;

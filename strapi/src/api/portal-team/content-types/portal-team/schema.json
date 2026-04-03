@@ -1,0 +1,37 @@
+{
+  "kind": "collectionType",
+  "collectionName": "portal_teams",
+  "info": {
+    "singularName": "portal-team",
+    "pluralName": "portal-teams",
+    "displayName": "Team Account"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "email": {
+      "type": "email",
+      "required": true,
+      "unique": true
+    },
+    "password": {
+      "type": "password",
+      "required": true,
+      "private": true
+    },
+    "teamName": {
+      "type": "string",
+      "required": true
+    },
+    "organization": {
+      "type": "string",
+      "required": true
+    },
+    "isActive": {
+      "type": "boolean",
+      "default": true
+    }
+  }
+}
